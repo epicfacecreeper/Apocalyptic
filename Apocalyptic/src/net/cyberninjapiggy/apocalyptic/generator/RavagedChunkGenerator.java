@@ -77,16 +77,16 @@ public class RavagedChunkGenerator extends ChunkGenerator {
                 
  
                 double maxHeight = gen1.noise(realX, realZ, frequency, amplitude) * multitude + sea_level;
-                for (int y=0;y<=5;y++) {
-                    if (y==0) {
-                        setBlock(x,(int)maxHeight,z,chunk,Material.BEDROCK);
+                for (int y = 1; y <= 6; y++) {
+                    if (y == 1) {
+                        setBlock(x,y,z,chunk,Material.BEDROCK);
                     } 
                     else {
                         if (rand.nextBoolean()) {
-                            setBlock(x,(int)maxHeight,z,chunk,Material.BEDROCK);
+                            setBlock(x,y,z,chunk,Material.BEDROCK);
                         }
                         else {
-                            setBlock(x,(int)maxHeight,z,chunk,Material.STONE);
+                            setBlock(x,y,z,chunk,Material.STONE);
                         }
                     }
                 }

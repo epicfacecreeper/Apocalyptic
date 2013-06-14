@@ -24,7 +24,7 @@ public class AbandonedHousePopulator extends BlockPopulator {
     public void populate(World world, Random rand, Chunk chunk) {
     	genLootTable(rand);
         if (world.canGenerateStructures()) {
-            if (rand.nextInt(200) == 0) {
+            if (rand.nextInt(400) == 0) {
                 int realX;
                 int realZ;
                 outer_loop:

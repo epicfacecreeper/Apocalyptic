@@ -27,7 +27,7 @@ public class TreePopulator extends BlockPopulator {
                         }
                     }
                     else {
-                        if (rand.nextInt(1000) == 0) {
+                        if (rand.nextInt(400) == 0) {
                             genTree(x, world.getHighestBlockYAt(x, z), z, world, rand);
                         }
                     }
