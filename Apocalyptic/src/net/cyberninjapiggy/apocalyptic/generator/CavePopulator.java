@@ -12,14 +12,13 @@ import org.bukkit.block.Block;
 import org.bukkit.generator.BlockPopulator;
 
 public class CavePopulator extends BlockPopulator {
-	//Taken from Nordic plugin for bukkit.
+	//Taken from Nordic plugin for bukkit, with modifications.
 
 	public void populate(World world, Random random, Chunk source)
 	  {
-	    if (random.nextInt(50) < 3) {
+	    if (random.nextInt(25) == 0) {
 	      int x = 4 + random.nextInt(8) + source.getX() * 16;
 	      int z = 4 + random.nextInt(8) + source.getZ() * 16;
-	      System.out.println("Cave at " + x + "," + z);
 	      int maxY = world.getHighestBlockYAt(x, z);
 	      if (maxY < 16) {
 	        maxY = 32;

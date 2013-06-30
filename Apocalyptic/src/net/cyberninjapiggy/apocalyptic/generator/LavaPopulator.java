@@ -27,7 +27,6 @@ public class LavaPopulator extends BlockPopulator {
 	    int rz = (source.getZ() << 4) + rz16;
 	    if (snapshot.getHighestBlockYAt(rx16, rz16) < 4)
 	      return;
-	    System.out.println("Lava at " + rx + "," + rz);
 	    int ry = random.nextInt(20) + 20;
 	    int radius = 2 + random.nextInt(4);
 

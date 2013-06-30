@@ -59,10 +59,10 @@ public final class Apocalyptic extends JavaPlugin {
     
     //private Villager acidRain = ((Villager) getServer().getWorlds().get(0).spawnEntity(new Location(getServer().getWorlds().get(0), 0, -128, 0), EntityType.VILLAGER));
     
-    public static ItemStack hazmatHood = setName(new ItemStack(Material.CHAINMAIL_HELMET, 1), "Â§rGas Mask");
-    public static ItemStack hazmatSuit = setName(new ItemStack(Material.CHAINMAIL_CHESTPLATE, 1), "Â§rHazmat Suit");
-    public static ItemStack hazmatPants = setName(new ItemStack(Material.CHAINMAIL_LEGGINGS, 1), "Â§rHazmat Pants");
-    public static ItemStack hazmatBoots = setName(new ItemStack(Material.CHAINMAIL_BOOTS, 1), "Â§rHazmat Boots");
+    public static ItemStack hazmatHood = setName(new ItemStack(Material.CHAINMAIL_HELMET, 1), "§rGas Mask");
+    public static ItemStack hazmatSuit = setName(new ItemStack(Material.CHAINMAIL_CHESTPLATE, 1), "§rHazmat Suit");
+    public static ItemStack hazmatPants = setName(new ItemStack(Material.CHAINMAIL_LEGGINGS, 1), "§rHazmat Pants");
+    public static ItemStack hazmatBoots = setName(new ItemStack(Material.CHAINMAIL_BOOTS, 1), "§rHazmat Boots");
     
     @Override
     public void onEnable(){
@@ -155,10 +155,7 @@ public final class Apocalyptic extends JavaPlugin {
         getServer().addRecipe(hazardChestR);
         getServer().addRecipe(hazardHelmetR);
         
-        //Schedules
-        
-        
-        
+        //Schedules      
         
         getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
             @Override

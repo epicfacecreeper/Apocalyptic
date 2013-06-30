@@ -29,7 +29,6 @@ public class DungeonPopulator extends BlockPopulator {
             int y=rand.nextInt(54);
             int x=(chunk.getX()*16) + rand.nextInt(16)-sizex;
             int z=(chunk.getZ()*16) + rand.nextInt(16)-sizez;
-            System.out.println("Generated dungeon at" + x +","+z);
             int chestsLeft = rand.nextInt(1)+1;
             for (int i=0;i<sizex+1;i++) {
                 for (int o=0;o<sizez+1;o++) {
