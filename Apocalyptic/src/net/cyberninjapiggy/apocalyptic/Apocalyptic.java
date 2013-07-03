@@ -55,7 +55,7 @@ public final class Apocalyptic extends JavaPlugin {
     private Database db;
     public static Random rand = new Random();
     
-    public static final String texturePack = "https://dl.dropboxusercontent.com/s/d0xnnntvu4mcehr/apocalyptic.zip?token_hash=AAFmM5uwnjBVRjnDKeapwv05VBwKKOEj5_BKSUz264iTUA&dl=1";
+    public static final String texturePack = "https://dl.dropboxusercontent.com/s/qilofl4m4e9uvxh/apocalyptic-1.6.zip?dl=1";
     
     //private Villager acidRain = ((Villager) getServer().getWorlds().get(0).spawnEntity(new Location(getServer().getWorlds().get(0), 0, -128, 0), EntityType.VILLAGER));
     
