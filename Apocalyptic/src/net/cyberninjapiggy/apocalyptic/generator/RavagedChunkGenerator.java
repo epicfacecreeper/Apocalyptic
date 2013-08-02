@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package net.cyberninjapiggy.apocalyptic.generator;
 
 import java.util.ArrayList;
@@ -54,6 +50,7 @@ public class RavagedChunkGenerator extends ChunkGenerator {
                 else if (world.getBiome(realX, realZ) == Biome.SWAMPLAND) {
                     multitude = 32; 
                     amplitude = 0.001;
+                    sea_level = 62;
                 }
                 else if (world.getBiome(realX, realZ) == Biome.MUSHROOM_ISLAND) {
                     multitude = 64; 
@@ -90,7 +87,7 @@ public class RavagedChunkGenerator extends ChunkGenerator {
                         }
                     }
                 }
-                for (int y=5;y<=maxHeight;y++) {
+                for (int y=5;y<maxHeight+1;y++) {
                     
                     if (y<maxHeight-5) {
                         setBlock(x,y,z,chunk,Material.STONE);

@@ -26,16 +26,16 @@ public class PlayerDamaged implements Listener {
             if (a.worldEnabledZombie(e.getEntity().getWorld().getName()) && e.getDamager().getType() == EntityType.ZOMBIE) {
                 e.setDamage(e.getDamage() * a.getConfig().getWorld(e.getEntity().getWorld()).getInt("mobs.zombies.damageMultiplier"));
                 if (a.getConfig().getWorld(e.getEntity().getWorld()).getBoolean("mobs.zombies.effects.hunger")) {
-                    ((Player) e.getEntity()).addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, 1, 20));
+                    ((Player) e.getEntity()).addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, 40, 1));
                 }
                 if (a.getConfig().getWorld(e.getEntity().getWorld()).getBoolean("mobs.zombies.effects.weakness")) {
-                    ((Player) e.getEntity()).addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 1, 20));
+                    ((Player) e.getEntity()).addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 40, 1));
                 }
                 if (a.getConfig().getWorld(e.getEntity().getWorld()).getBoolean("mobs.zombies.effects.slowness")) {
-                    ((Player) e.getEntity()).addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 1, 20));
+                    ((Player) e.getEntity()).addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 1));
                 }
                 if (a.getConfig().getWorld(e.getEntity().getWorld()).getBoolean("mobs.zombies.effects.nausea")) {
-                    ((Player) e.getEntity()).addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 1, 20));
+                    ((Player) e.getEntity()).addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 40, 1));
                 }
             }
         }

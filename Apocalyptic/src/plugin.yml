@@ -1,6 +1,6 @@
 name: Apocalyptic
 main: net.cyberninjapiggy.apocalyptic.Apocalyptic
-version: 2.2.2/1.6.1
+version: 2.2.3
 author: awesomefacecreeper
 description: Apocalyptic world generator, radiation manager, zombie apocalypses and more.
 load: startup
