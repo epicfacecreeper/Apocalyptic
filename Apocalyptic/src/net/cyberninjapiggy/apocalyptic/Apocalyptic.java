@@ -308,10 +308,10 @@ public final class Apocalyptic extends JavaPlugin {
         s.sendMessage("" + color + radiation + " Grays" + ChatColor.RESET);
     }
     public void sendApocalypticTexturePack(Player p) {
-        if (!getConfig().getBoolean("worlds."+p.getWorld().getName() + ".texturepack")) {
+        /*if (!getConfig().getBoolean("worlds."+p.getWorld().getName() + ".texturepack")) {
             return;
         }
-        p.setTexturePack(texturePack);
+        p.setTexturePack(texturePack);*/
     }
     public class ApocalypticConfiguration extends YamlConfiguration {
         public void update(YamlConfiguration defaults) {
