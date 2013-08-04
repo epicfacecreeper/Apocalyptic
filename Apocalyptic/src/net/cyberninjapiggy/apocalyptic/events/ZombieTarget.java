@@ -17,7 +17,7 @@ public class ZombieTarget implements Listener {
     private final Apocalyptic a;
     @EventHandler
     public void onEntityTarget(EntityTargetEvent e) {
-        if (!(e.getEntityType() == EntityType.ZOMBIE) || e.getTarget() == null) {
+        if (!(e.getEntityType() == EntityType.ZOMBIE) || e.getTarget() == null || a.worldEnabledZombie(e.getEntity().getWorld().getName())) {
             return;
         }
         double searchRadius = a.getConfig().getWorld(e.getEntity().getWorld()).getDouble("mobs.zombies.targetRange") * 2;
