@@ -28,8 +28,7 @@ worlds:
           nausea: true
 meta:
   #Do not edit version
-  version: 2.2.4
+  version: 2.2.5
   version-check: true
   auto-update: true
   show-download-progress: true
-    

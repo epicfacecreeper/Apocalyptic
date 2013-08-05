@@ -125,8 +125,8 @@ public class OasisPopulator extends BlockPopulator {
             matrix[col] = row;
         }
         
-        for (int x=0;x<size;x++) {
-            for (int y=0;y<size;y++) {
+        for (int x=0;x<mysize-1;x++) {
+            for (int y=0;y<mysize-1;y++) {
                 if (matrix[x][y] == 1) {
                     world.getBlockAt(realX+x, world.getHighestBlockYAt(realX+x, realZ+y)+30-level, realZ+y).setType(Material.DIRT);
                        

@@ -120,12 +120,12 @@ public final class Apocalyptic extends JavaPlugin {
         db.close();
         if (getConfig().getBoolean("meta.version-check")) {
         	Updater versionCheck = new Updater(this, "apocalyptic", this.getFile(), Updater.UpdateType.NO_DOWNLOAD, false);
-        	if (versionCheck.getLatestVersionString() != this.getDescription().getVersion()) {
+        	if (versionCheck.getLatestVersionString() != this.getDescription().getName() + " v" + this.getDescription().getVersion()) {
         		if (getConfig().getBoolean("meta.auto-update")) {
         			Updater updater = new Updater(this, "apocalyptic", this.getFile(), Updater.UpdateType.NO_VERSION_CHECK, getConfig().getBoolean("meta.show-download-progress"));
         		}
         		else {
-        			log.info("An update is available: Apocalyptic " + versionCheck.getLatestVersionString() + "(" + versionCheck.getFileSize() + " bytes)");
+        			log.info("An update is available: " + versionCheck.getLatestVersionString() + "(" + versionCheck.getFileSize() + " bytes)");
         		}
         	}
         }

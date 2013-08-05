@@ -87,21 +87,10 @@ public class RavagedChunkGenerator extends ChunkGenerator {
                         }
                     }
                 }
-                for (int y=5;y<maxHeight+1;y++) {
+                for (int y=5;y<=maxHeight+1;y++) {
                     
                     if (y<maxHeight-5) {
                         setBlock(x,y,z,chunk,Material.STONE);
-                    }
-                    else if (y==maxHeight) {
-                        if (maxHeight < world.getSeaLevel() - 12) {
-                            setBlock(x,(int)maxHeight,z,chunk,Material.SAND);
-                        }
-                        else if (maxHeight > 128) {
-                            setBlock(x,(int)maxHeight,z,chunk,Material.GRAVEL);
-                        }
-                        else {
-                             setBlock(x,(int)maxHeight,z,chunk,Material.MYCEL);
-                        }
                     }
                     else {
                         if (y>128) {
@@ -111,7 +100,12 @@ public class RavagedChunkGenerator extends ChunkGenerator {
                             setBlock(x,(int)y,z,chunk,Material.SAND);
                         }
                         else {
-                            setBlock(x,y,z,chunk,Material.DIRT);
+                        	if (y < maxHeight) {
+                        		setBlock(x,y,z,chunk,Material.DIRT);
+                        	}
+                        	else {
+                        		setBlock(x,y,z,chunk,Material.MYCEL);
+                        	}
                         }
                     }
                     
