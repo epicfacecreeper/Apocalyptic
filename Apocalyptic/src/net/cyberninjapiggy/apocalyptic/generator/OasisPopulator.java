@@ -72,10 +72,10 @@ public class OasisPopulator extends BlockPopulator {
                         else {
                             world.getBlockAt(realX+x, world.getHighestBlockYAt(realX+x, realZ+y)+30, realZ+y).setType(Material.GRASS);
                             if (rand.nextInt(5) == 0) {
-                                tree = new Location(world, realX+x, world.getHighestBlockYAt(realX+x, realZ+y)+30, realZ+y);
+                                tree = new Location(world, realX+x, world.getHighestBlockYAt(realX+x, realZ+y), realZ+y);
                             }
                             if (rand.nextInt(2) == 0) {
-                                world.getBlockAt(realX+x, world.getHighestBlockYAt(realX+x, realZ+y)+30, realZ+y).setTypeIdAndData(Material.LONG_GRASS.getId(), (byte) 1, true);
+                                world.getBlockAt(realX+x, world.getHighestBlockYAt(realX+x, realZ+y), realZ+y).setTypeIdAndData(Material.LONG_GRASS.getId(), (byte) 1, true);
                             }
                         }
                     }
@@ -101,16 +101,17 @@ public class OasisPopulator extends BlockPopulator {
                 default:
                     tt = TreeType.TREE;
             }
-            world.generateTree(tree, tt);
+            
             
             for (int i=1;i<3;i++) {
             	genDirtCircle(world, rand, chunk, size-i, i, realX, realZ);
             }
+            world.generateTree(tree, tt);
         }
     }
     public void genDirtCircle(World world, Random rand, Chunk chunk, int size, int level, int realX, int realZ) {
-    	int mysize = size - 2;
-        int[][] matrix = new int[mysize][];
+    	int mysize = size - 1;
+        int[][] matrix = new int[mysize][mysize];
         double midPoint = (matrix.length-1)/2.0;
         for (int col = 0; col < matrix.length; col++)
         {
@@ -128,7 +129,7 @@ public class OasisPopulator extends BlockPopulator {
         for (int x=0;x<mysize-1;x++) {
             for (int y=0;y<mysize-1;y++) {
                 if (matrix[x][y] == 1) {
-                    world.getBlockAt(realX+x, world.getHighestBlockYAt(realX+x, realZ+y)+30-level, realZ+y).setType(Material.DIRT);
+                    world.getBlockAt(realX+x+1, world.getHighestBlockYAt(realX+x+1, realZ+y+1)-(level+1), realZ+y+1).setType(Material.DIRT);
                        
                 }
             }
