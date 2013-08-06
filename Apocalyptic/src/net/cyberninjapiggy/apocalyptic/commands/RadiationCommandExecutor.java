@@ -45,10 +45,10 @@ public class RadiationCommandExecutor implements CommandExecutor {
                 }
             }
             else {
-                if (args.length == 0) {
+                if (args.length == 0 && a.canDoCommand((Player) sender, "radiation.self")) {
                     a.sendRadiationMessage(sender, a.getPlayerRadiation((Player) sender));
                 }
-                if (args.length == 1) {
+                if (args.length == 1 && a.canDoCommand((Player) sender, "radiation.other")) {
                     if (a.getServer().getPlayer(args[0]).isOnline()) {
                         a.sendRadiationMessage(sender, a.getPlayerRadiation(a.getServer().getPlayer(args[0])));
                     }
@@ -56,7 +56,7 @@ public class RadiationCommandExecutor implements CommandExecutor {
                         sender.sendMessage("Cannot find player \"" + args[0] + "\"");
                     }
                 }
-                if (args.length == 2) {
+                if (args.length == 2 && a.canDoCommand((Player) sender, "radiation.change")) {
                     if (a.getServer().getPlayer(args[0]).isOnline()) {
                         if (isNumeric(args[1])) {
                             a.setPlayerRadiation(a.getServer().getPlayer(args[0]), Double.parseDouble(args[1]));

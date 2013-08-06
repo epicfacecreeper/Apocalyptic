@@ -352,4 +352,27 @@ public final class Apocalyptic extends JavaPlugin {
         } 
         return config;
     }
+    public boolean canDoCommand(CommandSender p, String cmd) {
+    	if (p == getServer().getConsoleSender()) {
+    		return true;
+    	}
+    	boolean usePerms = getConfig().getBoolean("meta.permissions");
+    	if (usePerms) {
+    		return (cmd.equals("radiation.self") && p.hasPermission("apocalyptic.radiation.self")) ||
+    				(cmd.equals("radiation.other") && p.hasPermission("apocalyptic.radiation.other")) ||
+    				(cmd.equals("radiation.change") && p.hasPermission("apocalyptic.radiation.change.self"))  ||
+    				(cmd.equals("apocalyptic.radhelp") && p.hasPermission("apocalyptic.help.radiation")) ||
+    				(cmd.equals("apocalyptic.stop") && p.hasPermission("apocalyptic.admin.stop")) ||
+    				(cmd.equals("apocalyptic.reload") && p.hasPermission("apocalyptic.admin.reload"));
+    	}
+    	else {
+    		if (cmd.equals("radiation.other") || 
+    				cmd.equals("radiation.change") || 
+    				cmd.equals("apocalyptic.stop") ||
+    				cmd.equals("apocalyptic.reload")) {
+    			return ((Player) p).isOp();
+    		}
+    		return true;
+    	}
+    }
 }

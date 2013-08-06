@@ -5,6 +5,7 @@ import net.cyberninjapiggy.apocalyptic.Apocalyptic;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 /**
  *
@@ -39,14 +40,26 @@ public class ApocalypticCommandExecutor implements CommandExecutor {
         if ("apocalyptic".equals(label) && args.length==1) {
             switch (args[0]) {
                 case "reload":
+                	if (!a.canDoCommand(cs, "apocalyptic.reload")) {
+                		cs.sendMessage(ChatColor.RED + "You don't have permission to do that!" + ChatColor.RESET);
+                		return true;
+                	}
                     a.reloadConfig();
                     cs.sendMessage("Config reloaded.");
                     return true;
                 case "stop":
+                	if (!a.canDoCommand(cs, "apocalyptic.stop")) {
+                		cs.sendMessage(ChatColor.RED + "You don't have permission to do that!" + ChatColor.RESET);
+                		return true;
+                	}
                     cs.sendMessage("Stopping plugin...");
                     a.getServer().getPluginManager().disablePlugin(a);
                     return true;
                 case "radiation":
+                	if (!a.canDoCommand(cs, "apocalyptic.radhelp")) {
+                		cs.sendMessage(ChatColor.RED + "You don't have permission to do that!" + ChatColor.RESET);
+                		return true;
+                	}
                     cs.sendMessage(radiationHelp);
                     return true;
             }
