@@ -118,6 +118,8 @@ public final class Apocalyptic extends JavaPlugin {
         
         
         db.close();
+        
+        
         if (getConfig().getBoolean("meta.version-check")) {
         	Updater versionCheck = new Updater(this, "apocalyptic", this.getFile(), Updater.UpdateType.NO_DOWNLOAD, false);
         	if (versionCheck.getLatestVersionString() != this.getDescription().getName() + " v" + this.getDescription().getVersion()) {
@@ -125,7 +127,7 @@ public final class Apocalyptic extends JavaPlugin {
         			Updater updater = new Updater(this, "apocalyptic", this.getFile(), Updater.UpdateType.NO_VERSION_CHECK, getConfig().getBoolean("meta.show-download-progress"));
         		}
         		else {
-        			log.info("An update is available: " + versionCheck.getLatestVersionString() + "(" + versionCheck.getFileSize() + " bytes)");
+        			log.info(ChatColor.GREEN + "An update is available: " + versionCheck.getLatestVersionString() + "(" + versionCheck.getFileSize() + " bytes)" + ChatColor.RESET);
         		}
         	}
         }
