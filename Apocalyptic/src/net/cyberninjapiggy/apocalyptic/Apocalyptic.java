@@ -331,11 +331,10 @@ public final class Apocalyptic extends JavaPlugin {
     }
     public class ApocalypticConfiguration extends YamlConfiguration {
         public void update(YamlConfiguration defaults) {
-            Set<String> keys = defaults.getKeys(true);
-            for (String key : keys) {
-                if (this.get(key) == null) {
-                    this.set(key, defaults.get(key));
-                }
+            Map<String, Object> vals = this.getValues(true);
+            saveDefaultConfig();
+            for (String s : vals.keySet()) {
+            	this.set(s, vals.get(s));
             }
         }
         public ConfigurationSection getWorld(String world) {
