@@ -29,6 +29,7 @@ public class MonsterSpawn implements Listener {
                 l.getWorld().spawnEntity(l, EntityType.GIANT);
                 return;
             }
+            e.getEntity().setHealth(a.getConfig().getWorld(e.getEntity().getWorld()).getDouble("mobs.zombies.health"));
             if (e.getSpawnReason() != SpawnReason.CUSTOM) {
                 int hordeSize = Apocalyptic.rand.nextInt(
                         a.getConfig().getWorld(e.getEntity().getWorld()).getInt("mobs.zombies.hordeSize.max") - 
