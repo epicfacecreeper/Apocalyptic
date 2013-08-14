@@ -5,6 +5,7 @@ author: awesomefacecreeper
 description: Apocalyptic world generator, radiation manager, zombie apocalypses and more.
 load: startup
 depend: [SQLibrary]
+soft-depend: [WorldGuard]
 prefix: Apocalyptic
 commands:
   radiation:
