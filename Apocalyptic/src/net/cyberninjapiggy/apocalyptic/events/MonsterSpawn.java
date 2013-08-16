@@ -24,20 +24,20 @@ public class MonsterSpawn implements Listener {
         if (e.getEntityType() == EntityType.ZOMBIE) {
             
             Location l = e.getLocation();
-            if (Apocalyptic.rand.nextInt(300) == 0 && a.getConfig().getWorld(e.getLocation().getWorld()).getBoolean("mobs.mutants.zombie")) {
+            if (a.rand.nextInt(300) == 0 && a.getConfig().getWorld(e.getLocation().getWorld()).getBoolean("mobs.mutants.zombie")) {
                 e.setCancelled(true);
                 l.getWorld().spawnEntity(l, EntityType.GIANT);
                 return;
             }
             e.getEntity().setHealth(a.getConfig().getWorld(e.getEntity().getWorld()).getDouble("mobs.zombies.health"));
             if (e.getSpawnReason() != SpawnReason.CUSTOM) {
-                int hordeSize = Apocalyptic.rand.nextInt(
+                int hordeSize = a.rand.nextInt(
                         a.getConfig().getWorld(e.getEntity().getWorld()).getInt("mobs.zombies.hordeSize.max") - 
                         a.getConfig().getWorld(e.getEntity().getWorld()).getInt("mobs.zombies.hordeSize.min")) + 
                         a.getConfig().getWorld(e.getEntity().getWorld()).getInt("mobs.zombies.hordeSize.min");
                 for (int i=0;i<hordeSize;i++) {
-                    int spotX = 7-Apocalyptic.rand.nextInt(14);
-                    int spotZ = 7-Apocalyptic.rand.nextInt(14);
+                    int spotX = 7-a.rand.nextInt(14);
+                    int spotZ = 7-a.rand.nextInt(14);
                     Location spawnPoint = l.add(spotX, 0, spotZ);
                     spawnPoint.setY(l.getWorld().getHighestBlockYAt(spotX, spotZ));
                     
@@ -49,7 +49,7 @@ public class MonsterSpawn implements Listener {
         }
         if (e.getEntityType() == EntityType.CREEPER) {
             if (a.getConfig().getBoolean("worlds." + e.getLocation().getWorld().getName() + ".mobs.mutants.creeper")) {
-                if (Apocalyptic.rand.nextInt(100) == 0) {
+                if (a.rand.nextInt(100) == 0) {
                     ((Creeper) e.getEntity()).setPowered(true);
                     return;
                 }
@@ -57,7 +57,7 @@ public class MonsterSpawn implements Listener {
         }
         if (e.getEntityType() == EntityType.SKELETON) {
             if (a.getConfig().getBoolean("worlds." + e.getLocation().getWorld().getName() + ".mobs.mutants.skeleton")) {
-                if (Apocalyptic.rand.nextInt(100) == 0) {
+                if (a.rand.nextInt(100) == 0) {
                     ((Skeleton) e.getEntity()).setSkeletonType(Skeleton.SkeletonType.WITHER);
                     ((Skeleton) e.getEntity()).getEquipment().setItemInHand(new ItemStack(Material.IRON_SWORD, 0));
                 }

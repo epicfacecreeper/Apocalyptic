@@ -25,6 +25,7 @@ import net.cyberninjapiggy.apocalyptic.events.PlayerEat;
 import net.cyberninjapiggy.apocalyptic.events.PlayerJoin;
 import net.cyberninjapiggy.apocalyptic.events.PlayerMove;
 import net.cyberninjapiggy.apocalyptic.events.PlayerSpawn;
+import net.cyberninjapiggy.apocalyptic.events.ZombieCombust;
 import net.cyberninjapiggy.apocalyptic.events.ZombieTarget;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -56,7 +57,7 @@ public final class Apocalyptic extends JavaPlugin {
     private Map<String, Double> radiationLevels = new HashMap<>();
     private static Logger log;
     private Database db;
-    public static Random rand = new Random();
+    public Random rand;
     
     public static final String texturePack = "https://dl.dropboxusercontent.com/s/qilofl4m4e9uvxh/apocalyptic-1.6.zip?dl=1";
     
@@ -71,6 +72,7 @@ public final class Apocalyptic extends JavaPlugin {
     public void onEnable(){
         //acidRain.setCustomName("Acid Rain");
         log = getLogger();
+        rand = new Random();
         
         if (!getDataFolder().exists()) {
             getDataFolder().mkdir();
@@ -148,6 +150,7 @@ public final class Apocalyptic extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerChangeWorld(this), this);
         getServer().getPluginManager().registerEvents(new PlayerJoin(this), this);
         getServer().getPluginManager().registerEvents(new ZombieTarget(this), this);
+        getServer().getPluginManager().registerEvents(new ZombieCombust(this), this);
         
         //Add recipes
         ShapedRecipe hazardHelmetR = new ShapedRecipe(hazmatHood);
@@ -187,7 +190,7 @@ public final class Apocalyptic extends JavaPlugin {
                                 p.damage(p.getWorld().getDifficulty().getValue()*2);
                             }
                             //Neurological death syndrome
-                            if (getPlayerRadiation(p) >= 10) {
+                            if (getPlayerRadiation(p) >= 10.0) {
                                 ArrayList<PotionEffect> pfx = new ArrayList<>();
                                 pfx.add(new PotionEffect(PotionEffectType.BLINDNESS, 10 * 20, 2));
                                 pfx.add(new PotionEffect(PotionEffectType.CONFUSION, 10 * 20, 2));

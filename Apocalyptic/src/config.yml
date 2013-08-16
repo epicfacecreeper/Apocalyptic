@@ -14,7 +14,8 @@ worlds:
         creeper: true
         skeleton: true
       zombies:
-	    health: 25.0
+        burnInDaylight: false
+        health: 25.0
         speedMultiplier: 3.0
         damageMultiplier: 2
         hordeInstinct: true
