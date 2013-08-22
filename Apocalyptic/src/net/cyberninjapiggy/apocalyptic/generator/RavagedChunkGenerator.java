@@ -8,6 +8,8 @@ import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.generator.BlockPopulator;
 import org.bukkit.generator.ChunkGenerator;
+import org.bukkit.util.noise.OctaveGenerator;
+import org.bukkit.util.noise.PerlinOctaveGenerator;
 import org.bukkit.util.noise.SimplexOctaveGenerator;
 
 /**
@@ -27,7 +29,7 @@ public class RavagedChunkGenerator extends ChunkGenerator {
 }
     @Override
     public byte[][] generateBlockSections(World world, Random rand, int ChunkX, int ChunkZ, BiomeGrid biome) {
-        SimplexOctaveGenerator gen1 = new SimplexOctaveGenerator(world,8);
+        OctaveGenerator gen1 = new PerlinOctaveGenerator(world,8);
         gen1.setScale(1/64.0);
         byte[][] chunk = new byte[world.getMaxHeight() / 16][];
         for (int x=0; x<16; x++) { 

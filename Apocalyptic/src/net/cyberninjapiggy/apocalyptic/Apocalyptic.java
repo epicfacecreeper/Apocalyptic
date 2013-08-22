@@ -25,6 +25,7 @@ import net.cyberninjapiggy.apocalyptic.events.PlayerEat;
 import net.cyberninjapiggy.apocalyptic.events.PlayerJoin;
 import net.cyberninjapiggy.apocalyptic.events.PlayerMove;
 import net.cyberninjapiggy.apocalyptic.events.PlayerSpawn;
+import net.cyberninjapiggy.apocalyptic.events.StopHazmatCrafting;
 import net.cyberninjapiggy.apocalyptic.events.ZombieCombust;
 import net.cyberninjapiggy.apocalyptic.events.ZombieTarget;
 import org.bukkit.ChatColor;
@@ -67,6 +68,7 @@ public final class Apocalyptic extends JavaPlugin {
     public static ItemStack hazmatSuit = setName(new ItemStack(Material.CHAINMAIL_CHESTPLATE, 1), "§rHazmat Suit");
     public static ItemStack hazmatPants = setName(new ItemStack(Material.CHAINMAIL_LEGGINGS, 1), "§rHazmat Pants");
     public static ItemStack hazmatBoots = setName(new ItemStack(Material.CHAINMAIL_BOOTS, 1), "§rHazmat Boots");
+    
     
     @Override
     public void onEnable(){
@@ -129,7 +131,7 @@ public final class Apocalyptic extends JavaPlugin {
         	Updater versionCheck = new Updater(this, "apocalyptic", this.getFile(), Updater.UpdateType.NO_DOWNLOAD, false);
         	if (versionCheck.getLatestVersionString() != this.getDescription().getName() + " v" + this.getDescription().getVersion()) {
         		if (getConfig().getBoolean("meta.auto-update")) {
-        			Updater updater = new Updater(this, "apocalyptic", this.getFile(), Updater.UpdateType.NO_VERSION_CHECK, getConfig().getBoolean("meta.show-download-progress"));
+        			new Updater(this, "apocalyptic", this.getFile(), Updater.UpdateType.NO_VERSION_CHECK, getConfig().getBoolean("meta.show-download-progress"));
         		}
         		else {
         			log.info(ChatColor.GREEN + "An update is available: " + versionCheck.getLatestVersionString() + "(" + versionCheck.getFileSize() + " bytes)" + ChatColor.RESET);
@@ -151,6 +153,7 @@ public final class Apocalyptic extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerJoin(this), this);
         getServer().getPluginManager().registerEvents(new ZombieTarget(this), this);
         getServer().getPluginManager().registerEvents(new ZombieCombust(this), this);
+        getServer().getPluginManager().registerEvents(new StopHazmatCrafting(this), this);
         
         //Add recipes
         ShapedRecipe hazardHelmetR = new ShapedRecipe(hazmatHood);
@@ -190,7 +193,7 @@ public final class Apocalyptic extends JavaPlugin {
                                 p.damage(p.getWorld().getDifficulty().getValue()*2);
                             }
                             //Neurological death syndrome
-                            if (getPlayerRadiation(p) >= 10.0) {
+                            if (getPlayerRadiation(p) >= 10.0D) {
                                 ArrayList<PotionEffect> pfx = new ArrayList<>();
                                 pfx.add(new PotionEffect(PotionEffectType.BLINDNESS, 10 * 20, 2));
                                 pfx.add(new PotionEffect(PotionEffectType.CONFUSION, 10 * 20, 2));
@@ -203,7 +206,7 @@ public final class Apocalyptic extends JavaPlugin {
                             boolean hazmatSuit = playerWearingHazmatSuit(p);
                             boolean aboveLowPoint = p.getLocation().getBlockY() > getConfig().getWorld(w).getInt("radiationBottom");
                             boolean belowHighPoint = p.getLocation().getBlockY() < getConfig().getWorld(w).getInt("radiationTop");
-                            boolean random = new Random(p.getWorld().getSeed()).nextInt(6) == 0;
+                            boolean random = new Random(p.getWorld().getSeed()).nextInt(4) == 0;
                             if (!hazmatSuit
                                     && aboveLowPoint
                                     && belowHighPoint

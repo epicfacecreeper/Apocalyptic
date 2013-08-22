@@ -16,7 +16,7 @@ public class LavaPopulator extends BlockPopulator {
 	//Taken from Nordic bukkit plugin
 	public void populate(World world, Random random, Chunk source)
 	  {
-	    if (random.nextInt(100) >= 2) {
+	    if (random.nextInt(50) >= 2) {
 	      return;
 	    }
 	    ChunkSnapshot snapshot = source.getChunkSnapshot();

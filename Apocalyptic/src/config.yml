@@ -28,7 +28,6 @@ worlds:
           weakness: true
           slowness: true
           nausea: true
-		
 meta:
   #Do not edit version
   version: 2.2.7
