@@ -1,11 +1,14 @@
 package net.cyberninjapiggy.apocalyptic.events;
 
 import net.cyberninjapiggy.apocalyptic.Apocalyptic;
+import net.cyberninjapiggy.apocalyptic.misc.ZombieHelper;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Skeleton;
+import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
@@ -22,6 +25,11 @@ public class MonsterSpawn implements Listener {
     public void onMonsterSpawn(CreatureSpawnEvent e) {
         
         if (e.getEntityType() == EntityType.ZOMBIE) {
+        	if (e.getEntity().getWorld().getEntitiesByClass(Zombie.class).size() >= 
+        			a.getConfig().getWorld(e.getLocation().getWorld()).getInt("mobs.zombies.spawnLimit")) {
+        		e.setCancelled(true);
+        		return;
+        	}
             
             Location l = e.getLocation();
             if (a.rand.nextInt(300) == 0 && a.getConfig().getWorld(e.getLocation().getWorld()).getBoolean("mobs.mutants.zombie")) {
@@ -30,18 +38,24 @@ public class MonsterSpawn implements Listener {
                 return;
             }
             e.getEntity().setHealth(a.getConfig().getWorld(e.getEntity().getWorld()).getDouble("mobs.zombies.health"));
-            if (e.getSpawnReason() != SpawnReason.CUSTOM) {
+            if (e.getSpawnReason() != SpawnReason.CUSTOM && e.getSpawnReason() != SpawnReason.SPAWNER) {
                 int hordeSize = a.rand.nextInt(
                         a.getConfig().getWorld(e.getEntity().getWorld()).getInt("mobs.zombies.hordeSize.max") - 
                         a.getConfig().getWorld(e.getEntity().getWorld()).getInt("mobs.zombies.hordeSize.min")) + 
                         a.getConfig().getWorld(e.getEntity().getWorld()).getInt("mobs.zombies.hordeSize.min");
-                for (int i=0;i<hordeSize;i++) {
+                int failedAttempts = 0;
+                for (int i=0;i<hordeSize;) {
                     int spotX = 7-a.rand.nextInt(14);
                     int spotZ = 7-a.rand.nextInt(14);
                     Location spawnPoint = l.add(spotX, 0, spotZ);
                     spawnPoint.setY(l.getWorld().getHighestBlockYAt(spotX, spotZ));
-                    
+                    if (!ZombieHelper.canZombieSpawn(spawnPoint) && failedAttempts <= 10) {
+                    	failedAttempts++;
+                    	continue;
+                    }
+                    failedAttempts = 0;
                     l.getWorld().spawnEntity(spawnPoint, EntityType.ZOMBIE);
+                    i++;
                     
                 }
             }
