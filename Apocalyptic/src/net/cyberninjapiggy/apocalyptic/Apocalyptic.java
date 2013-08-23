@@ -49,6 +49,8 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.flags.StateFlag;
 
 /**
  *
@@ -59,6 +61,8 @@ public final class Apocalyptic extends JavaPlugin {
     private static Logger log;
     private Database db;
     public Random rand;
+    public Plugin wg;
+    public boolean wgEnabled = true;
     
     public static final String texturePack = "https://dl.dropboxusercontent.com/s/qilofl4m4e9uvxh/apocalyptic-1.6.zip?dl=1";
     
@@ -75,6 +79,10 @@ public final class Apocalyptic extends JavaPlugin {
         //acidRain.setCustomName("Acid Rain");
         log = getLogger();
         rand = new Random();
+        wg = getWorldGuard();
+        if (wg == null) {
+        	wgEnabled = false;
+        }
         
         if (!getDataFolder().exists()) {
             getDataFolder().mkdir();
@@ -183,37 +191,42 @@ public final class Apocalyptic extends JavaPlugin {
             @Override
             public void run() {
                 for (World w : getServer().getWorlds()) {
-                    if (worldEnabledFallout(w.getName())) {
-                        for (Player p : w.getPlayers()) {
-                            //Acid Rain
-                            Location l = p.getLocation();
-                            if (p.getEquipment().getHelmet() == null
-                                    && p.getWorld().getHighestBlockYAt(l.getBlockX(), l.getBlockZ()) <= l.getBlockY() &&
-                                    p.getWorld().hasStorm()) {
-                                p.damage(p.getWorld().getDifficulty().getValue()*2);
-                            }
-                            //Neurological death syndrome
-                            if (getPlayerRadiation(p) >= 10.0D) {
-                                ArrayList<PotionEffect> pfx = new ArrayList<>();
-                                pfx.add(new PotionEffect(PotionEffectType.BLINDNESS, 10 * 20, 2));
-                                pfx.add(new PotionEffect(PotionEffectType.CONFUSION, 10 * 20, 2));
-                                pfx.add(new PotionEffect(PotionEffectType.SLOW, 10 * 20, 2));
-                                pfx.add(new PotionEffect(PotionEffectType.SLOW_DIGGING, 10 * 20, 2));
-                                pfx.add(new PotionEffect(PotionEffectType.WEAKNESS, 10 * 20, 2));
-                                p.addPotionEffects(pfx);
-                            }
-                            //Add radiation
-                            boolean hazmatSuit = playerWearingHazmatSuit(p);
-                            boolean aboveLowPoint = p.getLocation().getBlockY() > getConfig().getWorld(w).getInt("radiationBottom");
-                            boolean belowHighPoint = p.getLocation().getBlockY() < getConfig().getWorld(w).getInt("radiationTop");
-                            boolean random = new Random(p.getWorld().getSeed()).nextInt(4) == 0;
-                            if (!hazmatSuit
-                                    && aboveLowPoint
-                                    && belowHighPoint
-                                    && random) {
-                                addPlayerRadiation(p, (p.getWorld().getEnvironment() == Environment.NETHER ? 0.2 : 0.1) * Math.round(p.getLevel() / 10));
-                            }
-                        }
+                	Object regions = null;
+                    for (Player p : w.getPlayers()) {
+                    	if (wgEnabled) {
+                    		regions = ((WorldGuardPlugin)wg).getRegionManager(w).getApplicableRegions(p.getLocation());
+                    		
+                    	}
+                    	if (worldEnabledFallout(w.getName())) {
+	                        //Acid Rain
+	                        Location l = p.getLocation();
+	                        if (p.getEquipment().getHelmet() == null
+	                                && p.getWorld().getHighestBlockYAt(l.getBlockX(), l.getBlockZ()) <= l.getBlockY() &&
+	                                p.getWorld().hasStorm()) {
+	                            p.damage(p.getWorld().getDifficulty().getValue()*2);
+	                        }
+	                        //Neurological death syndrome
+	                        if (getPlayerRadiation(p) >= 10.0D) {
+	                            ArrayList<PotionEffect> pfx = new ArrayList<>();
+	                            pfx.add(new PotionEffect(PotionEffectType.BLINDNESS, 10 * 20, 2));
+	                            pfx.add(new PotionEffect(PotionEffectType.CONFUSION, 10 * 20, 2));
+	                            pfx.add(new PotionEffect(PotionEffectType.SLOW, 10 * 20, 2));
+	                            pfx.add(new PotionEffect(PotionEffectType.SLOW_DIGGING, 10 * 20, 2));
+	                            pfx.add(new PotionEffect(PotionEffectType.WEAKNESS, 10 * 20, 2));
+	                            p.addPotionEffects(pfx);
+	                        }
+	                        //Add radiation
+	                        boolean hazmatSuit = playerWearingHazmatSuit(p);
+	                        boolean aboveLowPoint = p.getLocation().getBlockY() > getConfig().getWorld(w).getInt("radiationBottom");
+	                        boolean belowHighPoint = p.getLocation().getBlockY() < getConfig().getWorld(w).getInt("radiationTop");
+	                        boolean random = new Random(p.getWorld().getSeed()).nextInt(4) == 0;
+	                        if (!hazmatSuit
+	                                && aboveLowPoint
+	                                && belowHighPoint
+	                                && random) {
+	                            addPlayerRadiation(p, (p.getWorld().getEnvironment() == Environment.NETHER ? 0.2 : 0.1) * Math.round(p.getLevel() / 10));
+	                        }
+	                    }
                     }
                 }
             }
@@ -385,7 +398,7 @@ public final class Apocalyptic extends JavaPlugin {
     		return true;
     	}
     }
-    private WorldGuardPlugin getWorldGuard() {
+    private Plugin getWorldGuard() {
         Plugin plugin = getServer().getPluginManager().getPlugin("WorldGuard");
      
         // WorldGuard may not be loaded
@@ -393,6 +406,6 @@ public final class Apocalyptic extends JavaPlugin {
             return null; // Maybe you want throw an exception instead
         }
      
-        return (WorldGuardPlugin) plugin;
+        return plugin;
     }
 }

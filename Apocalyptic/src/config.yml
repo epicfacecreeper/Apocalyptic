@@ -29,6 +29,9 @@ worlds:
           weakness: true
           slowness: true
           nausea: true
+regions:
+  fallout_area:
+    fallout: true
 meta:
   #Do not edit version
   version: 2.2.8
