@@ -1,4 +1,4 @@
-package net.cyberninjapiggy.apocalyptic;
+package net.cyberninjapiggy.apocalyptic.misc;
 /*
  * Updater for Bukkit.
  *

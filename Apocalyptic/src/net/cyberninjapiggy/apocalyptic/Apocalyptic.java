@@ -1,6 +1,9 @@
 package net.cyberninjapiggy.apocalyptic;
 
 import net.cyberninjapiggy.apocalyptic.generator.RavagedChunkGenerator;
+import net.cyberninjapiggy.apocalyptic.misc.Messages;
+import net.cyberninjapiggy.apocalyptic.misc.Updater;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -68,10 +71,10 @@ public final class Apocalyptic extends JavaPlugin {
     
     //private Villager acidRain = ((Villager) getServer().getWorlds().get(0).spawnEntity(new Location(getServer().getWorlds().get(0), 0, -128, 0), EntityType.VILLAGER));
     
-    public static ItemStack hazmatHood = setName(new ItemStack(Material.CHAINMAIL_HELMET, 1), "§rGas Mask");
-    public static ItemStack hazmatSuit = setName(new ItemStack(Material.CHAINMAIL_CHESTPLATE, 1), "§rHazmat Suit");
-    public static ItemStack hazmatPants = setName(new ItemStack(Material.CHAINMAIL_LEGGINGS, 1), "§rHazmat Pants");
-    public static ItemStack hazmatBoots = setName(new ItemStack(Material.CHAINMAIL_BOOTS, 1), "§rHazmat Boots");
+    public static ItemStack hazmatHood = setName(new ItemStack(Material.CHAINMAIL_HELMET, 1), ChatColor.RESET + Messages.getString("Apocalyptic.gasMask"));
+    public static ItemStack hazmatSuit = setName(new ItemStack(Material.CHAINMAIL_CHESTPLATE, 1), ChatColor.RESET + Messages.getString("Apocalyptic.hazmatSuit"));
+    public static ItemStack hazmatPants = setName(new ItemStack(Material.CHAINMAIL_LEGGINGS, 1), ChatColor.RESET + Messages.getString("Apocalyptic.hazmatPants"));
+    public static ItemStack hazmatBoots = setName(new ItemStack(Material.CHAINMAIL_BOOTS, 1), ChatColor.RESET + Messages.getString("Apocalyptic.hazmatBoots"));
     
     
     @Override
@@ -103,10 +106,10 @@ public final class Apocalyptic extends JavaPlugin {
                 getConfig().update(defaults);
             }
         }
-        db = new SQLite(log, "[Apocalyptic] ", getDataFolder().getAbsolutePath(), "apocalyptic");
+        db = new SQLite(log, Messages.getString("Apocalyptic.logtitle"), getDataFolder().getAbsolutePath(), Messages.getString("Apocalyptic.dbname"));
         
         if (!db.open()) {
-            log.severe("Could not open database");
+            log.severe(Messages.getString("Apocalyptic.errNotOpenDatabase"));
             this.setEnabled(false);
             return;
         }
@@ -136,13 +139,13 @@ public final class Apocalyptic extends JavaPlugin {
         
         
         if (getConfig().getBoolean("meta.version-check")) {
-        	Updater versionCheck = new Updater(this, "apocalyptic", this.getFile(), Updater.UpdateType.NO_DOWNLOAD, false);
+        	Updater versionCheck = new Updater(this, Messages.getString("Apocalyptic.devbukkitSlug"), this.getFile(), Updater.UpdateType.NO_DOWNLOAD, false);
         	if (versionCheck.getLatestVersionString() != this.getDescription().getName() + " v" + this.getDescription().getVersion()) {
         		if (getConfig().getBoolean("meta.auto-update")) {
-        			new Updater(this, "apocalyptic", this.getFile(), Updater.UpdateType.NO_VERSION_CHECK, getConfig().getBoolean("meta.show-download-progress"));
+        			new Updater(this, Messages.getString("Apocalyptic.devbukkitSlug"), this.getFile(), Updater.UpdateType.NO_VERSION_CHECK, getConfig().getBoolean("meta.show-download-progress"));
         		}
         		else {
-        			log.info(ChatColor.GREEN + "An update is available: " + versionCheck.getLatestVersionString() + "(" + versionCheck.getFileSize() + " bytes)" + ChatColor.RESET);
+        			log.info(ChatColor.GREEN + Messages.getString("Apocalyptic.updateAvaliable") + versionCheck.getLatestVersionString() + "(" + versionCheck.getFileSize() + " bytes)" + ChatColor.RESET); //$NON-NLS-3$
         		}
         	}
         }
@@ -169,11 +172,11 @@ public final class Apocalyptic extends JavaPlugin {
         hazardHelmetR.setIngredient('S', Material.SPONGE);
         
         ShapedRecipe hazardChestR = new ShapedRecipe(hazmatSuit);
-        hazardChestR.shape("S S", "SSS", "SSS");
+        hazardChestR.shape("S S", "SSS", "SSS"); //$NON-NLS-3$
         hazardChestR.setIngredient('S', Material.SPONGE);
         
         ShapedRecipe hazardPantsR = new ShapedRecipe(hazmatPants);
-        hazardPantsR.shape("SSS", "S S", "S S");
+        hazardPantsR.shape("SSS", "S S", "S S"); //$NON-NLS-3$
         hazardPantsR.setIngredient('S', Material.SPONGE);
         
         ShapedRecipe hazardBootsR = new ShapedRecipe(hazmatBoots);
@@ -236,16 +239,16 @@ public final class Apocalyptic extends JavaPlugin {
     @Override
     public void onDisable() {
         if (!db.open()) {
-            log.severe("Could not open database!");
+            log.severe(Messages.getString("Apocalyptic.errNotOpenDatabase"));
             return;
         }
         try {
             for (Entry<String, Double> entry : radiationLevels.entrySet()) {
-                if (db.query("SELECT COUNT(*) AS exists FROM radiationLevels WHERE name=" + entry.getKey() + "").getInt("exists") > 0) {
+                if (db.query("SELECT COUNT(*) AS exists FROM radiationLevels WHERE name=" + entry.getKey() + "").getInt("exists") > 0) { //$NON-NLS-3$
                     db.query("UPDATE radiationLevels SET level="+entry.getValue()+" WHERE name=" + entry.getKey());
                 }
                 else {
-                    db.query("INSERT INTO radiationLevels (name, level) VALUES (" + entry.getValue() + ", " + entry.getKey() + ")");
+                    db.query("INSERT INTO radiationLevels (name, level) VALUES (" + entry.getValue() + ", " + entry.getKey() + ")"); //$NON-NLS-3$
                 }
             }
             
@@ -264,10 +267,10 @@ public final class Apocalyptic extends JavaPlugin {
         return is;
     }
     public boolean worldEnabledFallout(String name) {
-        return getConfig().getConfigurationSection("worlds").getKeys(false).contains(name) && getConfig().getBoolean("worlds." + name + ".fallout");
+        return getConfig().getConfigurationSection("worlds").getKeys(false).contains(name) && getConfig().getBoolean("worlds." + name + ".fallout"); //$NON-NLS-3$
     }
     public boolean worldEnabledZombie(String name) {
-        return getConfig().getConfigurationSection("worlds").getKeys(false).contains(name) && getConfig().getBoolean("worlds." + name + ".zombie");
+        return getConfig().getConfigurationSection("worlds").getKeys(false).contains(name) && getConfig().getBoolean("worlds." + name + ".zombie"); //$NON-NLS-3$
     }
     public boolean playerWearingHazmatSuit(Player p) {
         EntityEquipment e = p.getEquipment();
@@ -281,28 +284,28 @@ public final class Apocalyptic extends JavaPlugin {
         
         if (getPlayerRadiation(p) >= 0.8 && getPlayerRadiation(p) < 1) {
             p.sendMessage(new String[] {
-                ChatColor.RED + "[WARNING] " + ChatColor.GOLD + "Your radiation level is reaching a critical level." + ChatColor.RESET,
-                ChatColor.RED + "[WARNING] " + ChatColor.GOLD + "Haematopoiesis will soon set in." + ChatColor.RESET});
+                ChatColor.RED + Messages.getString("Apocalyptic.warning") + ChatColor.GOLD + Messages.getString("Apocalyptic.radiationCriticalWarning") + ChatColor.RESET,
+                ChatColor.RED + Messages.getString("Apocalyptic.warning") + ChatColor.GOLD + Messages.getString("Apocalyptic.radBloodWarning") + ChatColor.RESET});
         }
         if (getPlayerRadiation(p) >= 1 && getPlayerRadiation(p) < 6) {
             p.sendMessage(new String[] {
-                ChatColor.RED + "[WARNING] " + ChatColor.GOLD + "Your radiation has reached a dangerous level." + ChatColor.RESET, 
-                ChatColor.RED + "[WARNING] " + ChatColor.GOLD + "Haematopoiesis has set in." + ChatColor.RESET,
-                ChatColor.RED + "[WARNING] " + ChatColor.GOLD + "You will take more damage when attacked." + ChatColor.RESET
+                ChatColor.RED + Messages.getString("Apocalyptic.warning") + ChatColor.GOLD + Messages.getString("Apocalyptic.radDangerLevel") + ChatColor.RESET, 
+                ChatColor.RED + Messages.getString("Apocalyptic.warning") + ChatColor.GOLD + Messages.getString("Apocalyptic.radBlood") + ChatColor.RESET,
+                ChatColor.RED + Messages.getString("Apocalyptic.warning") + ChatColor.GOLD + Messages.getString("Apocalyptic.takemoredamage") + ChatColor.RESET
             });
         }
         if (getPlayerRadiation(p) >= 6 && getPlayerRadiation(p) < 10) {
             p.sendMessage(new String[] {
-                ChatColor.RED + "[WARNING] " + ChatColor.GOLD + "Your radiation has reached a critical level." + ChatColor.RESET, 
-                ChatColor.RED + "[WARNING] " + ChatColor.GOLD + "Your symptoms now include Haematopoiesis and Gastrointestinal Dysfunction." + ChatColor.RESET,
-            ChatColor.RED + "[WARNING] " + ChatColor.GOLD + "You will take more damage when attacked and will not be able to eat." + ChatColor.RESET
+                ChatColor.RED + Messages.getString("Apocalyptic.warning") + ChatColor.GOLD + Messages.getString("Apocalyptic.radiationCritical") + ChatColor.RESET, 
+                ChatColor.RED + Messages.getString("Apocalyptic.warning") + ChatColor.GOLD + Messages.getString("Apocalyptic.radBloodStomach") + ChatColor.RESET,
+            ChatColor.RED + Messages.getString("Apocalyptic.warning") + ChatColor.GOLD + Messages.getString("Apocalyptic.takeMoreDamageandNoEat") + ChatColor.RESET
             });
         }
         if (getPlayerRadiation(p) >= 10) {
             p.sendMessage(new String[] {
-                ChatColor.RED + "[WARNING] " + ChatColor.GOLD + "Your radiation has reached a deadly level." + ChatColor.RESET, 
-                ChatColor.RED + "[WARNING] " + ChatColor.GOLD + "Your symptoms now include Haematopoiesis, Gastrointestinal Dysfunction, and Neurological Death." + ChatColor.RESET,
-            ChatColor.RED + "[WARNING] " + ChatColor.GOLD + "You will take more damage when attacked, will not be able to eat, and will have far increased damage, dizziness, and a decreased level of consciousness." + ChatColor.RESET
+                ChatColor.RED + Messages.getString("Apocalyptic.warning") + ChatColor.GOLD + Messages.getString("Apocalyptic.radDeadly") + ChatColor.RESET, 
+                ChatColor.RED + Messages.getString("Apocalyptic.warning") + ChatColor.GOLD + Messages.getString("Apocalyptic.radAll") + ChatColor.RESET,
+            ChatColor.RED + Messages.getString("Apocalyptic.warning") + ChatColor.GOLD + Messages.getString("Apocalyptic.radAllExplain") + ChatColor.RESET
             });
         }
         
@@ -340,7 +343,7 @@ public final class Apocalyptic extends JavaPlugin {
             color = ChatColor.BLACK;
         }
         
-        s.sendMessage("" + color + radiation + " Grays" + ChatColor.RESET);
+        s.sendMessage("" + color + radiation + " " + Messages.getString("Apocalyptic.grays") + ChatColor.RESET);
     }
     public void sendApocalypticTexturePack(Player p) {
         /*if (!getConfig().getBoolean("worlds."+p.getWorld().getName() + ".texturepack")) {
