@@ -10,7 +10,6 @@ import org.bukkit.generator.BlockPopulator;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.util.noise.OctaveGenerator;
 import org.bukkit.util.noise.PerlinOctaveGenerator;
-import org.bukkit.util.noise.SimplexOctaveGenerator;
 
 /**
  *

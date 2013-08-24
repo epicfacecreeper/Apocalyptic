@@ -6,8 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.MissingResourceException;
 import java.util.Properties;
-import java.util.ResourceBundle;
-
 import org.bukkit.plugin.Plugin;
 
 public class Messages {

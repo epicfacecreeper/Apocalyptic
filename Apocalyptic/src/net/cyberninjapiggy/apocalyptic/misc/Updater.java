@@ -6,7 +6,6 @@ package net.cyberninjapiggy.apocalyptic.misc;
  */
 
 import java.io.*;
-import java.lang.IllegalThreadStateException;
 import java.lang.Runnable;
 import java.lang.Thread;
 import java.net.MalformedURLException;
