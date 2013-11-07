@@ -25,11 +25,14 @@ import net.cyberninjapiggy.apocalyptic.events.PlayerChangeWorld;
 import net.cyberninjapiggy.apocalyptic.events.PlayerDamaged;
 import net.cyberninjapiggy.apocalyptic.events.PlayerEat;
 import net.cyberninjapiggy.apocalyptic.events.PlayerJoin;
+import net.cyberninjapiggy.apocalyptic.events.PlayerLeave;
 import net.cyberninjapiggy.apocalyptic.events.PlayerMove;
 import net.cyberninjapiggy.apocalyptic.events.PlayerSpawn;
 import net.cyberninjapiggy.apocalyptic.events.StopHazmatCrafting;
 import net.cyberninjapiggy.apocalyptic.events.ZombieCombust;
 import net.cyberninjapiggy.apocalyptic.events.ZombieTarget;
+
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -45,6 +48,7 @@ import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
@@ -57,16 +61,15 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
  * @author Nick
  */
 public final class Apocalyptic extends JavaPlugin {
-    private Map<String, Double> radiationLevels = new HashMap<>();
     private static Logger log;
     private Database db;
     public Random rand;
-    public Plugin wg;
-    public boolean wgEnabled = true;
+    private Plugin wg;
+    private boolean wgEnabled = true;
     
-    public static final String texturePack = "https://dl.dropboxusercontent.com/s/qilofl4m4e9uvxh/apocalyptic-1.6.zip?dl=1";
+    private static final String texturePack = "https://dl.dropboxusercontent.com/s/qilofl4m4e9uvxh/apocalyptic-1.6.zip?dl=1";
     
-    //private Villager acidRain = ((Villager) getServer().getWorlds().get(0).spawnEntity(new Location(getServer().getWorlds().get(0), 0, -128, 0), EntityType.VILLAGER));
+    public static final String METADATA_KEY = "radiation";
     
     public static ItemStack hazmatHood = setName(new ItemStack(Material.CHAINMAIL_HELMET, 1), ChatColor.RESET + Messages.getString("Apocalyptic.gasMask"));
     public static ItemStack hazmatSuit = setName(new ItemStack(Material.CHAINMAIL_CHESTPLATE, 1), ChatColor.RESET + Messages.getString("Apocalyptic.hazmatSuit"));
@@ -80,6 +83,7 @@ public final class Apocalyptic extends JavaPlugin {
         log = getLogger();
         rand = new Random();
         wg = getWorldGuard();
+        Messages.load(this);
         if (wg == null) {
         	wgEnabled = false;
         }
@@ -116,7 +120,7 @@ public final class Apocalyptic extends JavaPlugin {
                     + "player VARCHAR(16),"
                     + "level DOUBLE)");
         } catch (SQLException ex) {
-            Logger.getLogger(Apocalyptic.class.getName()).log(Level.SEVERE, null, ex);
+            log.log(Level.SEVERE, null, ex);
         }
         
         
@@ -125,10 +129,11 @@ public final class Apocalyptic extends JavaPlugin {
         try {
             result = db.query("SELECT * FROM radiationLevels");
             while (result.next()) {
-                radiationLevels.put(result.getString("player"), result.getDouble("level"));
+                //radiationLevels.put(result.getString("player"), result.getDouble("level"));
+            	Bukkit.getPlayer(result.getString("player")).setMetadata(METADATA_KEY, new FixedMetadataValue(this, result.getDouble("level")));
             }
         } catch (SQLException ex) {
-            Logger.getLogger(Apocalyptic.class.getName()).log(Level.SEVERE, null, ex);
+            log.log(Level.SEVERE, null, ex);
         }
         
         
@@ -136,13 +141,13 @@ public final class Apocalyptic extends JavaPlugin {
         
         
         if (getConfig().getBoolean("meta.version-check")) {
-        	Updater versionCheck = new Updater(this, Messages.getString("Apocalyptic.devbukkitSlug"), this.getFile(), Updater.UpdateType.NO_DOWNLOAD, false);
-        	if (versionCheck.getLatestVersionString() != this.getDescription().getName() + " v" + this.getDescription().getVersion()) {
+        	Updater versionCheck = new Updater(this, 43663, this.getFile(), Updater.UpdateType.NO_DOWNLOAD, false);
+        	if (versionCheck.getLatestName() != this.getDescription().getName() + " v" + this.getDescription().getVersion()) {
         		if (getConfig().getBoolean("meta.auto-update")) {
-        			new Updater(this, Messages.getString("Apocalyptic.devbukkitSlug"), this.getFile(), Updater.UpdateType.NO_VERSION_CHECK, getConfig().getBoolean("meta.show-download-progress"));
+        			new Updater(this, 43663, this.getFile(), Updater.UpdateType.NO_VERSION_CHECK, getConfig().getBoolean("meta.show-download-progress"));
         		}
         		else {
-        			log.info(ChatColor.GREEN + Messages.getString("Apocalyptic.updateAvaliable") + versionCheck.getLatestVersionString() + "(" + versionCheck.getFileSize() + " bytes)" + ChatColor.RESET); //$NON-NLS-3$
+        			log.info(ChatColor.GREEN + Messages.getString("Apocalyptic.updateAvaliable") + versionCheck.getLatestName() + ChatColor.RESET); //$NON-NLS-3$
         		}
         	}
         }
@@ -158,6 +163,7 @@ public final class Apocalyptic extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerDamaged(this), this);
         getServer().getPluginManager().registerEvents(new PlayerMove(this), this);
         getServer().getPluginManager().registerEvents(new PlayerChangeWorld(this), this);
+        getServer().getPluginManager().registerEvents(new PlayerLeave(this), this);
         getServer().getPluginManager().registerEvents(new PlayerJoin(this), this);
         getServer().getPluginManager().registerEvents(new ZombieTarget(this), this);
         getServer().getPluginManager().registerEvents(new ZombieCombust(this), this);
@@ -203,7 +209,7 @@ public final class Apocalyptic extends JavaPlugin {
 	                        if (p.getEquipment().getHelmet() == null
 	                                && p.getWorld().getHighestBlockYAt(l.getBlockX(), l.getBlockZ()) <= l.getBlockY() &&
 	                                p.getWorld().hasStorm()) {
-	                            p.damage(p.getWorld().getDifficulty().getValue()*2);
+	                            p.damage(p.getWorld().getDifficulty().ordinal()*2);
 	                        }
 	                        //Neurological death syndrome
 	                        if (getPlayerRadiation(p) >= 10.0D) {
@@ -240,13 +246,10 @@ public final class Apocalyptic extends JavaPlugin {
             return;
         }
         try {
-            for (Entry<String, Double> entry : radiationLevels.entrySet()) {
-                if (db.query("SELECT COUNT(*) AS exists FROM radiationLevels WHERE name=" + entry.getKey() + "").getInt("exists") > 0) { //$NON-NLS-3$
-                    db.query("UPDATE radiationLevels SET level="+entry.getValue()+" WHERE name=" + entry.getKey());
-                }
-                else {
-                    db.query("INSERT INTO radiationLevels (name, level) VALUES (" + entry.getValue() + ", " + entry.getKey() + ")"); //$NON-NLS-3$
-                }
+            for (World w : Bukkit.getWorlds()) {
+            	for (Player p : w.getPlayers()) {
+	                saveRadiation(p);
+            	}
             }
             
         } catch (SQLException ex) {
@@ -263,21 +266,49 @@ public final class Apocalyptic extends JavaPlugin {
         is.setItemMeta(m);
         return is;
     }
+    /**
+     * 
+     * @param name of the world
+     * @return whether the named world has fallout enabled
+     */
     public boolean worldEnabledFallout(String name) {
         return getConfig().getConfigurationSection("worlds").getKeys(false).contains(name) && getConfig().getBoolean("worlds." + name + ".fallout"); //$NON-NLS-3$
     }
+    /**
+     * 
+     * @param name of the world
+     * @return whether the named world has zombie apocalypse enabled
+     */
     public boolean worldEnabledZombie(String name) {
         return getConfig().getConfigurationSection("worlds").getKeys(false).contains(name) && getConfig().getBoolean("worlds." + name + ".zombie"); //$NON-NLS-3$
     }
+    /**
+     * 
+     * @param p The player
+     * @return whether the player has a full hazmat suit
+     */
     public boolean playerWearingHazmatSuit(Player p) {
         EntityEquipment e = p.getEquipment();
-        boolean helmet =  e.getHelmet() != null && e.getHelmet().getType() == Material.CHAINMAIL_HELMET;
-        boolean chest =  e.getChestplate() != null && e.getChestplate().getType() == Material.CHAINMAIL_CHESTPLATE;
-        boolean legs =  e.getLeggings() != null && e.getLeggings().getType() == Material.CHAINMAIL_LEGGINGS;
-        boolean boots =  e.getBoots() != null && e.getBoots().getType() == Material.CHAINMAIL_BOOTS;
+        boolean helmet =  e.getHelmet() != null && e.getHelmet().getType() == Material.CHAINMAIL_HELMET && e.getHelmet().getItemMeta().getDisplayName().equals(ChatColor.RESET + Messages.getString("Apocalyptic.gasMask"));
+        boolean chest =  e.getChestplate() != null && e.getChestplate().getType() == Material.CHAINMAIL_CHESTPLATE && e.getChestplate().getItemMeta().getDisplayName().equals(ChatColor.RESET + Messages.getString("Apocalyptic.hazmatSuit"));
+        boolean legs =  e.getLeggings() != null && e.getLeggings().getType() == Material.CHAINMAIL_LEGGINGS && e.getLeggings().getItemMeta().getDisplayName().equals(ChatColor.RESET + Messages.getString("Apocalyptic.hazmatPants"));
+        boolean boots =  e.getBoots() != null && e.getBoots().getType() == Material.CHAINMAIL_BOOTS && e.getBoots().getItemMeta().getDisplayName().equals(ChatColor.RESET + Messages.getString("Apocalyptic.hazmatBoots"));
         return helmet && chest && legs && boots;
     }
+    /**
+     * 
+     * @param p the player which to add radiation to
+     * @param level the amount of radiation (in grays) to add to the player
+     */
     public void addPlayerRadiation(Player p, double level) {
+    	
+    	//p.setMetadata(METADATA_KEY, new FixedMetadataValue(p.getMetadata(METADATA_KEY).g));
+    	if (p.getMetadata(METADATA_KEY).size() > 0) {
+    		p.setMetadata(METADATA_KEY, new FixedMetadataValue(this, p.getMetadata(METADATA_KEY).get(0).asDouble()+level));
+    	}
+    	else {
+    		p.setMetadata(METADATA_KEY, new FixedMetadataValue(this, level));
+    	}
         
         if (getPlayerRadiation(p) >= 0.8 && getPlayerRadiation(p) < 1) {
             p.sendMessage(new String[] {
@@ -307,46 +338,36 @@ public final class Apocalyptic extends JavaPlugin {
         }
         
     }
+    /**
+     * 
+     * @param p the player
+     * @return the radiation level (in grays) of the specified player
+     */
     public double getPlayerRadiation(Player p) {
-        if (radiationLevels.containsKey(p.getName())) {
-            return radiationLevels.get(p.getName());
-        }
-        return 0;
+    	if (p.getMetadata(METADATA_KEY).size() > 0) 
+    		return p.getMetadata(METADATA_KEY).get(0).asDouble();
+    	else
+    		return 0;
     }
+    /**
+     * 
+     * @param p the player which to set the radiation level of
+     * @param radiation the level of radiation (in grays) that the player is set to
+     */
     public void setPlayerRadiation(Player p, double radiation) {
         addPlayerRadiation(p, getPlayerRadiation(p) * -1);
         addPlayerRadiation(p, radiation);
     }
     
-    
-    public void sendRadiationMessage(CommandSender s, double radiation) {
-        ChatColor color = ChatColor.GREEN;
-        if (radiation >= 0.8 && radiation < 1.0) {
-            color = ChatColor.YELLOW;
-        }
-        else if (radiation >= 1.0 && radiation < 5.0) {
-            color = ChatColor.RED;
-        }
-        else if (radiation >= 5.0 && radiation < 6.0) {
-            color = ChatColor.DARK_RED;
-        }
-        else if (radiation >= 6.0 && radiation < 9.0) {
-            color = ChatColor.LIGHT_PURPLE;
-        }
-        else if (radiation >= 9.0 && radiation < 10.0) {
-            color = ChatColor.DARK_PURPLE;
-        }
-        else if (radiation >= 10.0) {
-            color = ChatColor.BLACK;
-        }
-        
-        s.sendMessage("" + color + radiation + " " + Messages.getString("Apocalyptic.grays") + ChatColor.RESET);
-    }
+    /**
+     * Sends apocalyptic texture pack to a player.
+     * @param p the player which to send the texture pack to
+     */
     public void sendApocalypticTexturePack(Player p) {
-        /*if (!getConfig().getBoolean("worlds."+p.getWorld().getName() + ".texturepack")) {
+        if (!getConfig().getBoolean("worlds."+p.getWorld().getName() + ".texturepack")) {
             return;
         }
-        p.setTexturePack(texturePack);*/
+        p.setTexturePack(texturePack);
     }
     public class ApocalypticConfiguration extends YamlConfiguration {
         public void update(YamlConfiguration defaults) {
@@ -375,6 +396,12 @@ public final class Apocalyptic extends JavaPlugin {
         } 
         return config;
     }
+    /**
+     * 
+     * @param p a player
+     * @param cmd String alias of a command
+     * @return whether the specified player can perform the command
+     */
     public boolean canDoCommand(CommandSender p, String cmd) {
     	if (p == getServer().getConsoleSender()) {
     		return true;
@@ -407,5 +434,13 @@ public final class Apocalyptic extends JavaPlugin {
         }
      
         return plugin;
+    }
+    public void saveRadiation(Player p) throws SQLException {
+    	if (db.query("SELECT COUNT(*) AS exists FROM radiationLevels WHERE name=" + p.getName() + "").getInt("exists") > 0) { //$NON-NLS-3$
+            db.query("UPDATE radiationLevels SET level="+p.getMetadata(METADATA_KEY).get(0).asDouble()+" WHERE name=" + p.getName());
+        }
+        else {
+            db.query("INSERT INTO radiationLevels (name, level) VALUES (" + p.getMetadata(METADATA_KEY).get(0).asDouble() + ", " + p.getName() + ")"); //$NON-NLS-3$
+        }
     }
 }

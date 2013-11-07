@@ -1,6 +1,8 @@
 package net.cyberninjapiggy.apocalyptic.misc;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,14 +22,31 @@ public class Messages {
 				byte [] buffer = new byte[4096];
 				int bytesRead = input.read(buffer);
 				while (bytesRead != -1) {
-				    output.write(buffer, 0, bytesRead);
+				    output.write(buffer, 0, buffer.length);
 				    bytesRead = input.read(buffer);
 				}
 				output.close();
 				input.close();
 			}
 			catch(IOException e) {
-				p.getLogger().warning("Could not save strings, using defaults instead");
+				p.getLogger().warning("Could not save strings file.");
+			}
+		}
+		boolean useDefaults = false;
+		try {
+			strings.load(new FileInputStream(new File(p.getDataFolder(), "strings.properties")));
+		} catch (FileNotFoundException e) {
+			p.getLogger().warning("Could not load strings file.");
+			useDefaults = true;
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+		if (useDefaults) {
+			try {
+				strings.load(p.getClass().getClassLoader().getResourceAsStream("defaultStrings.properties"));
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
 	}

@@ -1,6 +1,9 @@
 package net.cyberninjapiggy.apocalyptic.commands;
 
 import net.cyberninjapiggy.apocalyptic.Apocalyptic;
+import net.cyberninjapiggy.apocalyptic.misc.Messages;
+
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -24,7 +27,7 @@ public class RadiationCommandExecutor implements CommandExecutor {
                 }
                 if (args.length == 1) {
                     if (a.getServer().getPlayer(args[0]).isOnline()) {
-                        a.sendRadiationMessage(sender, a.getPlayerRadiation(a.getServer().getPlayer(args[0])));
+                        sendRadiationMessage(sender, a.getPlayerRadiation(a.getServer().getPlayer(args[0])));
                     }
                     else {
                         sender.sendMessage("Cannot find player \"" + args[0] + "\"");
@@ -46,11 +49,11 @@ public class RadiationCommandExecutor implements CommandExecutor {
             }
             else {
                 if (args.length == 0 && a.canDoCommand((Player) sender, "radiation.self")) {
-                    a.sendRadiationMessage(sender, a.getPlayerRadiation((Player) sender));
+                    sendRadiationMessage(sender, a.getPlayerRadiation((Player) sender));
                 }
                 if (args.length == 1 && a.canDoCommand((Player) sender, "radiation.other")) {
                     if (a.getServer().getPlayer(args[0]).isOnline()) {
-                        a.sendRadiationMessage(sender, a.getPlayerRadiation(a.getServer().getPlayer(args[0])));
+                        sendRadiationMessage(sender, a.getPlayerRadiation(a.getServer().getPlayer(args[0])));
                     }
                     else {
                         sender.sendMessage("Cannot find player \"" + args[0] + "\"");
@@ -75,4 +78,27 @@ public class RadiationCommandExecutor implements CommandExecutor {
 	return false; 
     }
     private static boolean isNumeric(String str) {return str.matches("-?\\d+(\\.\\d+)?");}
+    private void sendRadiationMessage(CommandSender s, double radiation) {
+        ChatColor color = ChatColor.GREEN;
+        if (radiation >= 0.8 && radiation < 1.0) {
+            color = ChatColor.YELLOW;
+        }
+        else if (radiation >= 1.0 && radiation < 5.0) {
+            color = ChatColor.RED;
+        }
+        else if (radiation >= 5.0 && radiation < 6.0) {
+            color = ChatColor.DARK_RED;
+        }
+        else if (radiation >= 6.0 && radiation < 9.0) {
+            color = ChatColor.LIGHT_PURPLE;
+        }
+        else if (radiation >= 9.0 && radiation < 10.0) {
+            color = ChatColor.DARK_PURPLE;
+        }
+        else if (radiation >= 10.0) {
+            color = ChatColor.BLACK;
+        }
+        
+        s.sendMessage("" + color + radiation + " " + Messages.getString("Apocalyptic.grays") + ChatColor.RESET);
+    }
 }

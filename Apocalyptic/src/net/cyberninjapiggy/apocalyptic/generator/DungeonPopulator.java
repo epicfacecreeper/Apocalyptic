@@ -26,10 +26,13 @@ public class DungeonPopulator extends BlockPopulator {
             
             int sizex = getRandomOddNumber(rand, 5, 7);
             int sizez = getRandomOddNumber(rand, 5, 7);
-            int y=rand.nextInt(54);
+            int y=rand.nextInt(54)+1;
             int x=(chunk.getX()*16) + rand.nextInt(16)-sizex;
             int z=(chunk.getZ()*16) + rand.nextInt(16)-sizez;
-            int chestsLeft = rand.nextInt(1)+1;
+            while (world.getHighestBlockYAt(x, z) <= y) {
+            	y=rand.nextInt(54);
+            }
+            int chestsLeft = rand.nextInt(2)+1;
             for (int i=0;i<sizex+1;i++) {
                 for (int o=0;o<sizez+1;o++) {
                     for (int p=0;p<5;p++) {
