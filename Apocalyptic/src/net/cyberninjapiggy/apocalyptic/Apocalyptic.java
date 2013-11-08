@@ -230,7 +230,7 @@ public final class Apocalyptic extends JavaPlugin {
 	                                && aboveLowPoint
 	                                && belowHighPoint
 	                                && random) {
-	                            addPlayerRadiation(p, (p.getWorld().getEnvironment() == Environment.NETHER ? 0.2 : 0.1) * Math.round(p.getLevel() / 10));
+	                            addPlayerRadiation(p, (p.getWorld().getEnvironment() == Environment.NETHER ? 0.2 : 0.1) * (Math.round(p.getLevel() / 10)+1));
 	                        }
 	                    }
                     }
@@ -251,7 +251,7 @@ public final class Apocalyptic extends JavaPlugin {
 	                saveRadiation(p);
             	}
             }
-            
+            db.close();
         } catch (SQLException ex) {
             Logger.getLogger(Apocalyptic.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -436,11 +436,17 @@ public final class Apocalyptic extends JavaPlugin {
         return plugin;
     }
     public void saveRadiation(Player p) throws SQLException {
+    	if (!db.isOpen())
+    		db.open();
     	if (db.query("SELECT COUNT(*) AS exists FROM radiationLevels WHERE name=" + p.getName() + "").getInt("exists") > 0) { //$NON-NLS-3$
             db.query("UPDATE radiationLevels SET level="+p.getMetadata(METADATA_KEY).get(0).asDouble()+" WHERE name=" + p.getName());
         }
         else {
             db.query("INSERT INTO radiationLevels (name, level) VALUES (" + p.getMetadata(METADATA_KEY).get(0).asDouble() + ", " + p.getName() + ")"); //$NON-NLS-3$
         }
+    	//db.close();
+    }
+    public void closeDatabase() {
+    	db.close();
     }
 }
