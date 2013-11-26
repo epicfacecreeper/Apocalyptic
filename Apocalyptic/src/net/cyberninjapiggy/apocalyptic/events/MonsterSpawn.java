@@ -24,7 +24,7 @@ public class MonsterSpawn implements Listener {
     @EventHandler
     public void onMonsterSpawn(CreatureSpawnEvent e) {
         
-        if (e.getEntityType() == EntityType.ZOMBIE) {
+        if (e.getEntityType() == EntityType.ZOMBIE && a.worldEnabledZombie(e.getLocation().getWorld().getName())) {
         	if (e.getEntity().getWorld().getEntitiesByClass(Zombie.class).size() >= 
         			a.getConfig().getWorld(e.getLocation().getWorld()).getInt("mobs.zombies.spawnLimit")) {
         		e.setCancelled(true);

@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package net.cyberninjapiggy.apocalyptic.events;
 
 import net.cyberninjapiggy.apocalyptic.Apocalyptic;
@@ -20,6 +16,16 @@ public class PlayerEat implements Listener {
     private final Apocalyptic a;
     @EventHandler
     public void onPlayerEat(final PlayerItemConsumeEvent e) {
+    	boolean isCure = false;
+        for (String s : a.getConfig().getStringList("radiationCure")) {
+        	if (e.getItem().getType().equals(Material.matchMaterial(s))) {
+        		isCure = true;
+        		break;
+        	}
+        }
+        if (isCure) {
+        	a.setPlayerRadiation(e.getPlayer(), 0.0);
+        }
         if (a.getPlayerRadiation(e.getPlayer()) >= 6.0 && !e.isCancelled()) {
             final int oldLevel = e.getPlayer().getFoodLevel();
             a.getServer().getScheduler().scheduleSyncDelayedTask(a, new Runnable() {
@@ -31,6 +37,7 @@ public class PlayerEat implements Listener {
                 }
             }, 3);
         }
+        
     }
     public PlayerEat(Apocalyptic a) {
         this.a = a;

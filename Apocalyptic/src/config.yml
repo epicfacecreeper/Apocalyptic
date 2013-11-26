@@ -1,6 +1,7 @@
 lang: en
 maxRadiationWashable: 1
-notchApple: false
+radiationCures:
+  - GOLDEN_APPLE
 worlds:
   world:
     radiationTop: 120
