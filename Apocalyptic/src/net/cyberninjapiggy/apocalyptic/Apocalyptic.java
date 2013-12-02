@@ -1,42 +1,17 @@
 package net.cyberninjapiggy.apocalyptic;
 
-import net.cyberninjapiggy.apocalyptic.generator.RavagedChunkGenerator;
-import net.cyberninjapiggy.apocalyptic.misc.Messages;
-import net.cyberninjapiggy.apocalyptic.misc.Updater;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import lib.PatPeter.SQLibrary.Database;
 import lib.PatPeter.SQLibrary.SQLite;
 import net.cyberninjapiggy.apocalyptic.commands.ApocalypticCommandExecutor;
 import net.cyberninjapiggy.apocalyptic.commands.RadiationCommandExecutor;
-import net.cyberninjapiggy.apocalyptic.events.MonsterSpawn;
-import net.cyberninjapiggy.apocalyptic.events.PlayerChangeWorld;
-import net.cyberninjapiggy.apocalyptic.events.PlayerDamaged;
-import net.cyberninjapiggy.apocalyptic.events.PlayerEat;
-import net.cyberninjapiggy.apocalyptic.events.PlayerJoin;
-import net.cyberninjapiggy.apocalyptic.events.PlayerLeave;
-import net.cyberninjapiggy.apocalyptic.events.PlayerMove;
-import net.cyberninjapiggy.apocalyptic.events.PlayerSpawn;
-import net.cyberninjapiggy.apocalyptic.events.StopHazmatCrafting;
-import net.cyberninjapiggy.apocalyptic.events.ZombieCombust;
-import net.cyberninjapiggy.apocalyptic.events.ZombieTarget;
-
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import net.cyberninjapiggy.apocalyptic.events.*;
+import net.cyberninjapiggy.apocalyptic.generator.RavagedChunkGenerator;
+import net.cyberninjapiggy.apocalyptic.misc.Messages;
+import net.cyberninjapiggy.apocalyptic.misc.Updater;
+import org.bukkit.*;
 import org.bukkit.World.Environment;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
@@ -54,7 +29,17 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -66,24 +51,31 @@ public final class Apocalyptic extends JavaPlugin {
     public Random rand;
     private Plugin wg;
     private boolean wgEnabled = true;
+    private Messages messages;
     
     private static final String texturePack = "https://dl.dropboxusercontent.com/s/qilofl4m4e9uvxh/apocalyptic-1.6.zip?dl=1";
     
     public static final String METADATA_KEY = "radiation";
     
-    public static ItemStack hazmatHood = setName(new ItemStack(Material.CHAINMAIL_HELMET, 1), ChatColor.RESET + Messages.getString("Apocalyptic.gasMask"));
-    public static ItemStack hazmatSuit = setName(new ItemStack(Material.CHAINMAIL_CHESTPLATE, 1), ChatColor.RESET + Messages.getString("Apocalyptic.hazmatSuit"));
-    public static ItemStack hazmatPants = setName(new ItemStack(Material.CHAINMAIL_LEGGINGS, 1), ChatColor.RESET + Messages.getString("Apocalyptic.hazmatPants"));
-    public static ItemStack hazmatBoots = setName(new ItemStack(Material.CHAINMAIL_BOOTS, 1), ChatColor.RESET + Messages.getString("Apocalyptic.hazmatBoots"));
+    public static ItemStack hazmatHood;
+    public static ItemStack hazmatSuit;
+    public static ItemStack hazmatPants;
+    public static ItemStack hazmatBoots;
     
     
     @Override
     public void onEnable(){
+    	messages = new Messages(this);
         //acidRain.setCustomName("Acid Rain");
         log = getLogger();
         rand = new Random();
         wg = getWorldGuard();
-        Messages.load(this);
+        
+        hazmatHood = setName(new ItemStack(Material.CHAINMAIL_HELMET, 1), ChatColor.RESET + getMessages().getCaption("gasMask"));
+        hazmatSuit = setName(new ItemStack(Material.CHAINMAIL_CHESTPLATE, 1), ChatColor.RESET + getMessages().getCaption("hazmatSuit"));
+        hazmatPants = setName(new ItemStack(Material.CHAINMAIL_LEGGINGS, 1), ChatColor.RESET + getMessages().getCaption("hazmatPants"));
+        hazmatBoots = setName(new ItemStack(Material.CHAINMAIL_BOOTS, 1), ChatColor.RESET + getMessages().getCaption("hazmatBoots"));
+        
         if (wg == null) {
         	wgEnabled = false;
         }
@@ -91,7 +83,9 @@ public final class Apocalyptic extends JavaPlugin {
         if (!getDataFolder().exists()) {
             getDataFolder().mkdir();
         }
+        messages.saveDefault();
         if (!new File(getDataFolder().getPath() + File.separator + "config.yml").exists()) {
+        	getConfig().options().copyDefaults(true);
             saveDefaultConfig();
         }
         else {
@@ -107,10 +101,10 @@ public final class Apocalyptic extends JavaPlugin {
                 getConfig().update(defaults);
             }
         }
-        db = new SQLite(log, Messages.getString("Apocalyptic.logtitle"), getDataFolder().getAbsolutePath(), Messages.getString("Apocalyptic.dbname"));
+        db = new SQLite(log, getMessages().getCaption("logtitle"), getDataFolder().getAbsolutePath(), getMessages().getCaption("dbname"));
         
         if (!db.open()) {
-            log.severe(Messages.getString("Apocalyptic.errNotOpenDatabase"));
+            log.severe(getMessages().getCaption("errNotOpenDatabase"));
             this.setEnabled(false);
             return;
         }
@@ -147,7 +141,7 @@ public final class Apocalyptic extends JavaPlugin {
         			new Updater(this, 43663, this.getFile(), Updater.UpdateType.NO_VERSION_CHECK, getConfig().getBoolean("meta.show-download-progress"));
         		}
         		else {
-        			log.info(ChatColor.GREEN + Messages.getString("Apocalyptic.updateAvaliable") + versionCheck.getLatestName() + ChatColor.RESET); //$NON-NLS-3$
+        			log.info(ChatColor.GREEN + getMessages().getCaption("updateAvaliable") + versionCheck.getLatestName()); //$NON-NLS-3$
         		}
         	}
         }
@@ -199,11 +193,28 @@ public final class Apocalyptic extends JavaPlugin {
                 for (World w : getServer().getWorlds()) {
                 	Object regions = null;
                     for (Player p : w.getPlayers()) {
+                    	boolean noFallout = false;
+                    	boolean forceFallout = false;
                     	if (wgEnabled) {
                     		regions = ((WorldGuardPlugin)wg).getRegionManager(w).getApplicableRegions(p.getLocation());
-                    		
+                    		Iterator<ProtectedRegion> i = ((ApplicableRegionSet)regions).iterator();
+                    		while(i.hasNext()) {
+                    			ProtectedRegion next = i.next();
+                    			for (String s : getConfig().getStringList("regions.fallout")) {
+                    				if (next.getId().equals(s)) {
+                    					forceFallout = true;
+                    					break;
+                    				}
+                    			}
+                    			for (String s : getConfig().getStringList("regions.noFallout")) {
+                    				if (next.getId().equals(s)) {
+                    					noFallout = true;
+                    					break;
+                    				}
+                    			}
+                    		}
                     	}
-                    	if (worldEnabledFallout(w.getName())) {
+                    	if (!noFallout && (worldEnabledFallout(w.getName()) || forceFallout)) {
 	                        //Acid Rain
 	                        Location l = p.getLocation();
 	                        if (p.getEquipment().getHelmet() == null
@@ -242,7 +253,7 @@ public final class Apocalyptic extends JavaPlugin {
     @Override
     public void onDisable() {
         if (!db.open()) {
-            log.severe(Messages.getString("Apocalyptic.errNotOpenDatabase"));
+            log.severe(getMessages().getCaption("errNotOpenDatabase"));
             return;
         }
         try {
@@ -257,8 +268,8 @@ public final class Apocalyptic extends JavaPlugin {
         }
     }
     @Override
-    public ChunkGenerator getDefaultWorldGenerator(String worldName, String GenID) {
-        return new RavagedChunkGenerator();
+    public ChunkGenerator getDefaultWorldGenerator(String worldName, String genID) {
+        return new RavagedChunkGenerator(this, genID);
     }
     private static ItemStack setName(ItemStack is, String name){
         ItemMeta m = is.getItemMeta();
@@ -289,10 +300,10 @@ public final class Apocalyptic extends JavaPlugin {
      */
     public boolean playerWearingHazmatSuit(Player p) {
         EntityEquipment e = p.getEquipment();
-        boolean helmet =  e.getHelmet() != null && e.getHelmet().getType() == Material.CHAINMAIL_HELMET && e.getHelmet().getItemMeta().getDisplayName().equals(ChatColor.RESET + Messages.getString("Apocalyptic.gasMask"));
-        boolean chest =  e.getChestplate() != null && e.getChestplate().getType() == Material.CHAINMAIL_CHESTPLATE && e.getChestplate().getItemMeta().getDisplayName().equals(ChatColor.RESET + Messages.getString("Apocalyptic.hazmatSuit"));
-        boolean legs =  e.getLeggings() != null && e.getLeggings().getType() == Material.CHAINMAIL_LEGGINGS && e.getLeggings().getItemMeta().getDisplayName().equals(ChatColor.RESET + Messages.getString("Apocalyptic.hazmatPants"));
-        boolean boots =  e.getBoots() != null && e.getBoots().getType() == Material.CHAINMAIL_BOOTS && e.getBoots().getItemMeta().getDisplayName().equals(ChatColor.RESET + Messages.getString("Apocalyptic.hazmatBoots"));
+        boolean helmet =  e.getHelmet() != null && e.getHelmet().getType() == Material.CHAINMAIL_HELMET && e.getHelmet().getItemMeta().getDisplayName().equals(ChatColor.RESET + getMessages().getCaption("gasMask"));
+        boolean chest =  e.getChestplate() != null && e.getChestplate().getType() == Material.CHAINMAIL_CHESTPLATE && e.getChestplate().getItemMeta().getDisplayName().equals(ChatColor.RESET + getMessages().getCaption("hazmatSuit"));
+        boolean legs =  e.getLeggings() != null && e.getLeggings().getType() == Material.CHAINMAIL_LEGGINGS && e.getLeggings().getItemMeta().getDisplayName().equals(ChatColor.RESET + getMessages().getCaption("hazmatPants"));
+        boolean boots =  e.getBoots() != null && e.getBoots().getType() == Material.CHAINMAIL_BOOTS && e.getBoots().getItemMeta().getDisplayName().equals(ChatColor.RESET + getMessages().getCaption("hazmatBoots"));
         return helmet && chest && legs && boots;
     }
     /**
@@ -310,30 +321,30 @@ public final class Apocalyptic extends JavaPlugin {
     		p.setMetadata(METADATA_KEY, new FixedMetadataValue(this, level));
     	}
         
-        if (getPlayerRadiation(p) >= 0.8 && getPlayerRadiation(p) < 1) {
+        if (getPlayerRadiation(p) >= 0.8 && getPlayerRadiation(p) < 1.0) {
             p.sendMessage(new String[] {
-                ChatColor.RED + Messages.getString("Apocalyptic.warning") + ChatColor.GOLD + Messages.getString("Apocalyptic.radiationCriticalWarning") + ChatColor.RESET,
-                ChatColor.RED + Messages.getString("Apocalyptic.warning") + ChatColor.GOLD + Messages.getString("Apocalyptic.radBloodWarning") + ChatColor.RESET});
+                ChatColor.RED + getMessages().getCaption("warning") + ChatColor.GOLD + getMessages().getCaption("radiationCriticalWarning") ,
+                ChatColor.RED + getMessages().getCaption("warning") + ChatColor.GOLD + getMessages().getCaption("radBloodWarning") });
         }
-        if (getPlayerRadiation(p) >= 1 && getPlayerRadiation(p) < 6) {
+        if (getPlayerRadiation(p) >= 1.0 && getPlayerRadiation(p) < 6.0) {
             p.sendMessage(new String[] {
-                ChatColor.RED + Messages.getString("Apocalyptic.warning") + ChatColor.GOLD + Messages.getString("Apocalyptic.radDangerLevel") + ChatColor.RESET, 
-                ChatColor.RED + Messages.getString("Apocalyptic.warning") + ChatColor.GOLD + Messages.getString("Apocalyptic.radBlood") + ChatColor.RESET,
-                ChatColor.RED + Messages.getString("Apocalyptic.warning") + ChatColor.GOLD + Messages.getString("Apocalyptic.takemoredamage") + ChatColor.RESET
+                ChatColor.RED + getMessages().getCaption("warning") + ChatColor.GOLD + getMessages().getCaption("radDangerLevel") , 
+                ChatColor.RED + getMessages().getCaption("warning") + ChatColor.GOLD + getMessages().getCaption("radBlood") ,
+                ChatColor.RED + getMessages().getCaption("warning") + ChatColor.GOLD + getMessages().getCaption("takemoredamage") 
             });
         }
-        if (getPlayerRadiation(p) >= 6 && getPlayerRadiation(p) < 10) {
+        if (getPlayerRadiation(p) >= 6.0 && getPlayerRadiation(p) < 10.0) {
             p.sendMessage(new String[] {
-                ChatColor.RED + Messages.getString("Apocalyptic.warning") + ChatColor.GOLD + Messages.getString("Apocalyptic.radiationCritical") + ChatColor.RESET, 
-                ChatColor.RED + Messages.getString("Apocalyptic.warning") + ChatColor.GOLD + Messages.getString("Apocalyptic.radBloodStomach") + ChatColor.RESET,
-            ChatColor.RED + Messages.getString("Apocalyptic.warning") + ChatColor.GOLD + Messages.getString("Apocalyptic.takeMoreDamageandNoEat") + ChatColor.RESET
+                ChatColor.RED + getMessages().getCaption("warning") + ChatColor.GOLD + getMessages().getCaption("radiationCritical") , 
+                ChatColor.RED + getMessages().getCaption("warning") + ChatColor.GOLD + getMessages().getCaption("radBloodStomach") ,
+            ChatColor.RED + getMessages().getCaption("warning") + ChatColor.GOLD + getMessages().getCaption("takeMoreDamageandNoEat") 
             });
         }
         if (getPlayerRadiation(p) >= 10) {
             p.sendMessage(new String[] {
-                ChatColor.RED + Messages.getString("Apocalyptic.warning") + ChatColor.GOLD + Messages.getString("Apocalyptic.radDeadly") + ChatColor.RESET, 
-                ChatColor.RED + Messages.getString("Apocalyptic.warning") + ChatColor.GOLD + Messages.getString("Apocalyptic.radAll") + ChatColor.RESET,
-            ChatColor.RED + Messages.getString("Apocalyptic.warning") + ChatColor.GOLD + Messages.getString("Apocalyptic.radAllExplain") + ChatColor.RESET
+                ChatColor.RED + getMessages().getCaption("warning") + ChatColor.GOLD + getMessages().getCaption("radDeadly") , 
+                ChatColor.RED + getMessages().getCaption("warning") + ChatColor.GOLD + getMessages().getCaption("radAll") ,
+            ChatColor.RED + getMessages().getCaption("warning") + ChatColor.GOLD + getMessages().getCaption("radAllExplain") 
             });
         }
         
@@ -449,4 +460,8 @@ public final class Apocalyptic extends JavaPlugin {
     public void closeDatabase() {
     	db.close();
     }
+
+	public Messages getMessages() {
+		return messages;
+	}
 }

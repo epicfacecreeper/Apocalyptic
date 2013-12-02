@@ -17,7 +17,7 @@ public class PlayerEat implements Listener {
     @EventHandler
     public void onPlayerEat(final PlayerItemConsumeEvent e) {
     	boolean isCure = false;
-        for (String s : a.getConfig().getStringList("radiationCure")) {
+        for (String s : a.getConfig().getStringList("radiationCures")) {
         	if (e.getItem().getType().equals(Material.matchMaterial(s))) {
         		isCure = true;
         		break;

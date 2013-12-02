@@ -1,11 +1,11 @@
 package net.cyberninjapiggy.apocalyptic.generator;
 
-import java.util.Random;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.Biome;
 import org.bukkit.generator.BlockPopulator;
+
+import java.util.Random;
 
 /**
  *
@@ -20,17 +20,11 @@ public class TreePopulator extends BlockPopulator {
             for (int z2=0;z2<16;z2++) {
                 int z = z2 + chunk.getZ() * 16;
                 if (world.getBlockAt(x, world.getHighestBlockYAt(x, z)-1, z).getType() == Material.MYCEL) {
-                    if (world.getBiome(x, z) == Biome.FOREST || world.getBiome(x, z) == Biome.FOREST_HILLS) {
-                        if (rand.nextInt(300) == 0) {
-                            if (world.getBlockAt(x, world.getHighestBlockYAt(x, z), z).getType() == Material.MYCEL)
-                            genTree(x, world.getHighestBlockYAt(x, z), z, world, rand);
-                        }
+                    
+                    if (rand.nextInt(1500) == 0) {
+                        genTree(x, world.getHighestBlockYAt(x, z), z, world, rand);
                     }
-                    else {
-                        if (rand.nextInt(1500) == 0) {
-                            genTree(x, world.getHighestBlockYAt(x, z), z, world, rand);
-                        }
-                    }
+                    
                 }
             }
         }
@@ -68,7 +62,7 @@ public class TreePopulator extends BlockPopulator {
                 default:
                     metadata=0;
             }
-            int len  = rand.nextInt(5)+2;
+            int len  = rand.nextInt(3)+2;
             for (int o=0;o<len;o++) {
                 switch(dir) {
                     case 0:

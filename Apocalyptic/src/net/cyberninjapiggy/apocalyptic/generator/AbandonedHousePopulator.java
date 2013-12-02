@@ -1,9 +1,5 @@
 package net.cyberninjapiggy.apocalyptic.generator;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Random;
 import net.cyberninjapiggy.apocalyptic.Apocalyptic;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
@@ -12,6 +8,11 @@ import org.bukkit.block.Chest;
 import org.bukkit.generator.BlockPopulator;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Random;
 
 /**
  *

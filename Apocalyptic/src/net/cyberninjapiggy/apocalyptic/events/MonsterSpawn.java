@@ -2,7 +2,6 @@ package net.cyberninjapiggy.apocalyptic.events;
 
 import net.cyberninjapiggy.apocalyptic.Apocalyptic;
 import net.cyberninjapiggy.apocalyptic.misc.ZombieHelper;
-
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Creeper;

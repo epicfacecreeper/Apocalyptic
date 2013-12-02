@@ -33,8 +33,10 @@ worlds:
           nausea: true
 #NYFI
 regions:
-  fallout_area:
-    fallout: true
+  fallout:
+    - aRegionThatHasFallout
+  noFallout:
+    - aRegionThatHasNoFallout
 meta:
   #Do not edit version
   version: 2.2.10

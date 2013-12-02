@@ -1,12 +1,11 @@
 package net.cyberninjapiggy.apocalyptic.events;
 
-import java.sql.SQLException;
-
 import net.cyberninjapiggy.apocalyptic.Apocalyptic;
-
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
+
+import java.sql.SQLException;
 
 public class PlayerLeave implements Listener {
 

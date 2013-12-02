@@ -4,7 +4,6 @@
  */
 package net.cyberninjapiggy.apocalyptic.generator;
 
-import java.util.Random;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -13,6 +12,8 @@ import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.EntityType;
 import org.bukkit.generator.BlockPopulator;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.Random;
 
 /**
  *

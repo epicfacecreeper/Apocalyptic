@@ -1,8 +1,6 @@
 package net.cyberninjapiggy.apocalyptic.commands;
 
 import net.cyberninjapiggy.apocalyptic.Apocalyptic;
-import net.cyberninjapiggy.apocalyptic.misc.Messages;
-
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -99,6 +97,6 @@ public class RadiationCommandExecutor implements CommandExecutor {
             color = ChatColor.BLACK;
         }
         
-        s.sendMessage("" + color + radiation + " " + Messages.getString("Apocalyptic.grays") + ChatColor.RESET);
+        s.sendMessage(color +""+ radiation + " " + a.getMessages().getCaption("grays"));
     }
 }

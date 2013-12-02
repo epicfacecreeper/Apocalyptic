@@ -1,12 +1,9 @@
 package net.cyberninjapiggy.apocalyptic.generator;
 
-import java.util.Random;
-import org.bukkit.Chunk;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.TreeType;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.generator.BlockPopulator;
+
+import java.util.Random;
 
 /**
  *
@@ -82,7 +79,7 @@ public class OasisPopulator extends BlockPopulator {
                 }
             }
              TreeType tt;
-            switch(rand.nextInt(4)) {
+            switch(rand.nextInt(9)) {
                 case 0:
                     tt = TreeType.BIG_TREE;
                     break;
@@ -96,8 +93,20 @@ public class OasisPopulator extends BlockPopulator {
                     tt = TreeType.SMALL_JUNGLE;
                     break;
                 case 4:
-                    tt = TreeType.SMALL_JUNGLE;
+                    tt = TreeType.JUNGLE;
                     break;
+                case 5:
+                	tt = TreeType.ACACIA;
+                	break;
+                case 6:
+                	tt = TreeType.DARK_OAK;
+                	break;
+                case 7:
+                	tt = TreeType.REDWOOD;
+                	break;
+                case 8:
+                	tt = TreeType.TALL_REDWOOD;
+                	break;
                 default:
                     tt = TreeType.TREE;
             }

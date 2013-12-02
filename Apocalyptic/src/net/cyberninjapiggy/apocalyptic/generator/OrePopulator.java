@@ -2,12 +2,13 @@ package net.cyberninjapiggy.apocalyptic.generator;
 /**
  * Credit to jacek, with some changes to decrease veins spawned.
  */
-import java.util.Random;
 
 import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.generator.BlockPopulator;
+
+import java.util.Random;
 
 public class OrePopulator extends BlockPopulator {
 

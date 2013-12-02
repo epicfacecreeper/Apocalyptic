@@ -1,15 +1,17 @@
 package net.cyberninjapiggy.apocalyptic.generator;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.generator.BlockPopulator;
 import org.bukkit.generator.ChunkGenerator;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.util.noise.OctaveGenerator;
 import org.bukkit.util.noise.PerlinOctaveGenerator;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 /**
  *
@@ -17,7 +19,14 @@ import org.bukkit.util.noise.PerlinOctaveGenerator;
  */
 public class RavagedChunkGenerator extends ChunkGenerator {
 
-    public static void setBlock(int x, int y, int z, byte[][] chunk, Material material) {
+    private String genID;
+	private Plugin apocalyptic;
+
+	public RavagedChunkGenerator(Plugin p, String genID) {
+		this.genID = genID;
+		this.apocalyptic = p;
+	}
+	public static void setBlock(int x, int y, int z, byte[][] chunk, Material material) {
         if (chunk[y >> 4] == null)
             chunk[y >> 4] = new byte[16 * 16 * 16];
         if (!(y <= 256 && y >= 0 && x <= 16 && x >= 0 && z <= 16 && z >= 0))
@@ -41,10 +50,14 @@ public class RavagedChunkGenerator extends ChunkGenerator {
                 int multitude = 2;
                 int sea_level = 64;
                 if (world.getBiome(realX, realZ) == Biome.SMALL_MOUNTAINS || world.getBiome(realX, realZ) == Biome.FOREST_HILLS
-                        || world.getBiome(realX, realZ) == Biome.TAIGA_HILLS || world.getBiome(realX, realZ) == Biome.JUNGLE_HILLS) {
+                        || world.getBiome(realX, realZ) == Biome.TAIGA_HILLS || world.getBiome(realX, realZ) == Biome.JUNGLE_HILLS
+                        || world.getBiome(realX, realZ) == Biome.TAIGA_HILLS || world.getBiome(realX, realZ) == Biome.BIRCH_FOREST_HILLS
+                        || world.getBiome(realX, realZ) == Biome.COLD_TAIGA_HILLS || world.getBiome(realX, realZ) == Biome.DESERT_HILLS
+                        || world.getBiome(realX, realZ) == Biome.MEGA_TAIGA_HILLS) {
                     multitude = 16; 
                 }
-                else if (world.getBiome(realX, realZ) == Biome.EXTREME_HILLS) {
+                else if (world.getBiome(realX, realZ) == Biome.EXTREME_HILLS || world.getBiome(realX, realZ) == Biome.EXTREME_HILLS_MOUNTAINS
+                		|| world.getBiome(realX, realZ) == Biome.BIRCH_FOREST_MOUNTAINS || world.getBiome(realX, realZ) == Biome.TAIGA_MOUNTAINS) {
                     multitude = 32; 
                     amplitude = 0.1;
                 }
@@ -72,7 +85,11 @@ public class RavagedChunkGenerator extends ChunkGenerator {
                     amplitude = 0.1;
                     sea_level = 42;
                 }
-                
+                else if (world.getBiome(realX, realZ) == Biome.DEEP_OCEAN) {
+                	multitude = 16; 
+                    amplitude = 0.1;
+                    sea_level = 30;
+                }
  
                 double maxHeight = gen1.noise(realX, realZ, frequency, amplitude) * multitude + sea_level;
                 for (int y = 1; y <= 6; y++) {
@@ -101,11 +118,22 @@ public class RavagedChunkGenerator extends ChunkGenerator {
                             setBlock(x,(int)y,z,chunk,Material.SAND);
                         }
                         else {
-                        	if (y < maxHeight) {
-                        		setBlock(x,y,z,chunk,Material.DIRT);
+                        	if (world.getBiome(realX, realZ) == Biome.MESA || world.getBiome(realX, realZ) == Biome.MESA_BRYCE) {
+                        		setBlock(x,y,z,chunk,Material.HARD_CLAY);
+                        	}
+                        	else if (false && world.getBiome(realX, realZ) == Biome.SAVANNA) {
+                        		// TODO grassless dirt
+                        	}
+                        	else if (false && world.getBiome(realX, realZ) == Biome.FLOWER_FOREST) {
+                        		// TODO podzol
                         	}
                         	else {
-                        		setBlock(x,y,z,chunk,Material.MYCEL);
+	                        	if (y < maxHeight) {
+	                        		setBlock(x,y,z,chunk,Material.DIRT);
+	                        	}
+	                        	else {
+	                        		setBlock(x,y,z,chunk,Material.MYCEL);
+	                        	}
                         	}
                         }
                     }
@@ -132,6 +160,15 @@ public class RavagedChunkGenerator extends ChunkGenerator {
         pops.add(new AbandonedHousePopulator());
         pops.add(new CavePopulator());
         pops.add(new LavaPopulator());
+        
+        if (genID != null) {
+	        String[] schems = genID.split(":");
+	        for (String s : schems) {
+	        	String name = s.split("@")[0];
+	        	int chance = Integer.parseInt(s.split("@")[1]);
+	        	pops.add(new SchematicPopulator(apocalyptic, name, chance));
+	        }
+        }
         
         return pops;
     }

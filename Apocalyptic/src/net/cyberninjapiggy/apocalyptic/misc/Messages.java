@@ -1,64 +1,69 @@
 package net.cyberninjapiggy.apocalyptic.misc;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.MissingResourceException;
-import java.util.Properties;
+import org.bukkit.ChatColor;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 
+import java.io.File;
+import java.io.InputStream;
+ 
 public class Messages {
-
-	private static final Properties strings = new Properties();
-	public static void load(Plugin p) {
-		File folder = p.getDataFolder();
-		if (!new File(folder, "strings.properties").exists()) {
-			try {
-				InputStream input = p.getClass().getClassLoader().getResourceAsStream("defaultStrings.properties");
-				FileOutputStream output = new FileOutputStream(new File(folder, "strings.properties"));
-				byte [] buffer = new byte[4096];
-				int bytesRead = input.read(buffer);
-				while (bytesRead != -1) {
-				    output.write(buffer, 0, buffer.length);
-				    bytesRead = input.read(buffer);
-				}
-				output.close();
-				input.close();
-			}
-			catch(IOException e) {
-				p.getLogger().warning("Could not save strings file.");
-			}
-		}
-		boolean useDefaults = false;
-		try {
-			strings.load(new FileInputStream(new File(p.getDataFolder(), "strings.properties")));
-		} catch (FileNotFoundException e) {
-			p.getLogger().warning("Could not load strings file.");
-			useDefaults = true;
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-		}
-		if (useDefaults) {
-			try {
-				strings.load(p.getClass().getClassLoader().getResourceAsStream("defaultStrings.properties"));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+	private Plugin plugin = null;
+	 
+	private File configFile = null;
+	private FileConfiguration config = null;
+	 
+	public Messages(Plugin plugin)
+	{
+		this.plugin = plugin;
+		this.configFile = new File(this.plugin.getDataFolder(), "lang.yml");
+		 
+		this.reload();
+		this.saveDefault();
+	}
+	 
+	public void reload()
+	{
+		this.config = YamlConfiguration.loadConfiguration(this.configFile);
+		 
+		InputStream defaultConfigStream = this.plugin.getResource("lang.yml");
+		if (defaultConfigStream != null)
+		{
+			YamlConfiguration defaultConfig = YamlConfiguration.loadConfiguration(defaultConfigStream);
+			this.config.setDefaults(defaultConfig);
 		}
 	}
-
-	private Messages() {
-	}
-
-	public static String getString(String key) {
-		try {
-			return strings.getProperty(key);
-		} catch (MissingResourceException e) {
-			return '!' + key + '!';
+	 
+	public void saveDefault()
+	{
+		if (!this.configFile.exists())
+		{
+			this.plugin.saveResource("lang.yml", false);
 		}
+	}
+	 
+	public String getCaption(String name)
+	{
+		return this.getCaption(name, false);
+	}
+	 
+	public String getCaption(String name, boolean color)
+	{
+		String caption = this.config.getString(name);
+		if (caption == null)
+		{
+		this.plugin.getLogger().warning("Missing caption: " + name);
+		caption = "&c[missing caption]";
+		}
+		 
+		if (color)
+		{
+			caption = ChatColor.translateAlternateColorCodes('&', caption);
+		}
+		return caption;
+	}
+	public String getString(String msg) {
+		return getCaption(msg);
 	}
 }
