@@ -1,9 +1,9 @@
-lang: en
 maxRadiationWashable: 1
 radiationCures:
   - GOLDEN_APPLE
 worlds:
   world:
+    radiationRate: 0.1
     radiationTop: 120
     radiationBottom: 50
     texturepack: true
@@ -15,7 +15,6 @@ worlds:
         creeper: true
         skeleton: true
       zombies:
-        grabChance: 25
         spawnLimit: 512
         burnInDaylight: false
         health: 25.0

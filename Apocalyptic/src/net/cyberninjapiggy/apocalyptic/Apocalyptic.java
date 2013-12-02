@@ -93,10 +93,10 @@ public final class Apocalyptic extends JavaPlugin {
                 YamlConfiguration defaults = new YamlConfiguration();
                 try {
                     defaults.load(this.getClassLoader().getResourceAsStream("config.yml"));
-                } catch (FileNotFoundException ex) {
-                    Logger.getLogger(Apocalyptic.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (        IOException | InvalidConfigurationException ex) {
-                    Logger.getLogger(Apocalyptic.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                } catch (InvalidConfigurationException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                 }
                 getConfig().update(defaults);
             }
@@ -197,22 +197,20 @@ public final class Apocalyptic extends JavaPlugin {
                     	boolean forceFallout = false;
                     	if (wgEnabled) {
                     		regions = ((WorldGuardPlugin)wg).getRegionManager(w).getApplicableRegions(p.getLocation());
-                    		Iterator<ProtectedRegion> i = ((ApplicableRegionSet)regions).iterator();
-                    		while(i.hasNext()) {
-                    			ProtectedRegion next = i.next();
-                    			for (String s : getConfig().getStringList("regions.fallout")) {
-                    				if (next.getId().equals(s)) {
-                    					forceFallout = true;
-                    					break;
-                    				}
-                    			}
-                    			for (String s : getConfig().getStringList("regions.noFallout")) {
-                    				if (next.getId().equals(s)) {
-                    					noFallout = true;
-                    					break;
-                    				}
-                    			}
-                    		}
+                            for (ProtectedRegion next : ((ApplicableRegionSet) regions)) {
+                                for (String s : getConfig().getStringList("regions.fallout")) {
+                                    if (next.getId().equals(s)) {
+                                        forceFallout = true;
+                                        break;
+                                    }
+                                }
+                                for (String s : getConfig().getStringList("regions.noFallout")) {
+                                    if (next.getId().equals(s)) {
+                                        noFallout = true;
+                                        break;
+                                    }
+                                }
+                            }
                     	}
                     	if (!noFallout && (worldEnabledFallout(w.getName()) || forceFallout)) {
 	                        //Acid Rain
@@ -236,12 +234,12 @@ public final class Apocalyptic extends JavaPlugin {
 	                        boolean hazmatSuit = playerWearingHazmatSuit(p);
 	                        boolean aboveLowPoint = p.getLocation().getBlockY() > getConfig().getWorld(w).getInt("radiationBottom");
 	                        boolean belowHighPoint = p.getLocation().getBlockY() < getConfig().getWorld(w).getInt("radiationTop");
-	                        boolean random = new Random(p.getWorld().getSeed()).nextInt(4) == 0;
+	                        boolean random = rand.nextInt(4) == 0;
 	                        if (!hazmatSuit
 	                                && aboveLowPoint
 	                                && belowHighPoint
 	                                && random) {
-	                            addPlayerRadiation(p, (p.getWorld().getEnvironment() == Environment.NETHER ? 0.2 : 0.1) * (Math.round(p.getLevel() / 10)+1));
+	                            addPlayerRadiation(p, (p.getWorld().getEnvironment() == Environment.NETHER ? getConfig().getWorld(w).getDouble("radiationRate")*2 : getConfig().getWorld(w).getDouble("radiationRate")) * (Math.round(p.getLevel() / 10)+1));
 	                        }
 	                    }
                     }

@@ -1,8 +1,5 @@
 package net.cyberninjapiggy.apocalyptic.generator;
 
-import java.util.ArrayList;
-import java.util.Random;
-
 import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Material;
@@ -11,6 +8,9 @@ import org.bukkit.block.Block;
 import org.bukkit.generator.BlockPopulator;
 import org.bukkit.util.BlockVector;
 import org.bukkit.util.Vector;
+
+import java.util.ArrayList;
+import java.util.Random;
 
 public class LavaPopulator extends BlockPopulator {
 	//Taken from Nordic bukkit plugin
