@@ -4,6 +4,7 @@ import net.cyberninjapiggy.apocalyptic.Apocalyptic;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.metadata.FixedMetadataValue;
 
 /**
  *
@@ -14,6 +15,7 @@ public class PlayerJoin implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
         a.sendApocalypticTexturePack(e.getPlayer());
+        a.loadRadiation(e.getPlayer());
     }
     public PlayerJoin(Apocalyptic a) {
         this.a = a;

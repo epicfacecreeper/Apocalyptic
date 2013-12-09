@@ -19,7 +19,7 @@ public class PlayerLeave implements Listener {
 	public void onPlayerLeave(PlayerQuitEvent e) {
 		try {
 			apocalyptic.saveRadiation(e.getPlayer());
-			apocalyptic.closeDatabase();
+			//apocalyptic.closeDatabase();
 		} catch (SQLException e1) {
 			e1.printStackTrace();
 		}

@@ -93,16 +93,14 @@ public final class Apocalyptic extends JavaPlugin {
                 YamlConfiguration defaults = new YamlConfiguration();
                 try {
                     defaults.load(this.getClassLoader().getResourceAsStream("config.yml"));
-                } catch (IOException ex) {
+                } catch (IOException | InvalidConfigurationException ex) {
                     ex.printStackTrace();
-                } catch (InvalidConfigurationException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                 }
                 getConfig().update(defaults);
             }
         }
-        db = new SQLite(log, getMessages().getCaption("logtitle"), getDataFolder().getAbsolutePath(), getMessages().getCaption("dbname"));
-        
+        db = new SQLite(log, getMessages().getCaption("logtitle"), getDataFolder().getAbsolutePath(), "apocalyptic");
+
         if (!db.open()) {
             log.severe(getMessages().getCaption("errNotOpenDatabase"));
             this.setEnabled(false);
@@ -112,31 +110,18 @@ public final class Apocalyptic extends JavaPlugin {
             db.query("CREATE TABLE IF NOT EXISTS radiationLevels ("
                     + "id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,"
                     + "player VARCHAR(16),"
-                    + "level DOUBLE)");
+                    + "level DOUBLE);");
         } catch (SQLException ex) {
             log.log(Level.SEVERE, null, ex);
         }
         
         
-        
-        ResultSet result;
-        try {
-            result = db.query("SELECT * FROM radiationLevels");
-            while (result.next()) {
-                //radiationLevels.put(result.getString("player"), result.getDouble("level"));
-            	Bukkit.getPlayer(result.getString("player")).setMetadata(METADATA_KEY, new FixedMetadataValue(this, result.getDouble("level")));
-            }
-        } catch (SQLException ex) {
-            log.log(Level.SEVERE, null, ex);
-        }
-        
-        
-        db.close();
+       db.close();
         
         
         if (getConfig().getBoolean("meta.version-check")) {
         	Updater versionCheck = new Updater(this, 43663, this.getFile(), Updater.UpdateType.NO_DOWNLOAD, false);
-        	if (versionCheck.getLatestName() != this.getDescription().getName() + " v" + this.getDescription().getVersion()) {
+        	if (!versionCheck.getLatestName().equals(this.getDescription().getName() + " v" + this.getDescription().getVersion())) {
         		if (getConfig().getBoolean("meta.auto-update")) {
         			new Updater(this, 43663, this.getFile(), Updater.UpdateType.NO_VERSION_CHECK, getConfig().getBoolean("meta.show-download-progress"));
         		}
@@ -191,7 +176,7 @@ public final class Apocalyptic extends JavaPlugin {
             @Override
             public void run() {
                 for (World w : getServer().getWorlds()) {
-                	Object regions = null;
+                	Object regions;
                     for (Player p : w.getPlayers()) {
                     	boolean noFallout = false;
                     	boolean forceFallout = false;
@@ -378,31 +363,14 @@ public final class Apocalyptic extends JavaPlugin {
         }
         p.setTexturePack(texturePack);
     }
-    public class ApocalypticConfiguration extends YamlConfiguration {
-        public void update(YamlConfiguration defaults) {
-            Map<String, Object> vals = this.getValues(true);
-            saveDefaultConfig();
-            for (String s : vals.keySet()) {
-            	this.set(s, vals.get(s));
-            }
-        }
-        public ConfigurationSection getWorld(String world) {
-            return this.getConfigurationSection("worlds."+world);
-        }
-        public ConfigurationSection getWorld(World world) {
-            return this.getConfigurationSection("worlds."+world.getName());
-        }
-    }
     @Override
     public ApocalypticConfiguration getConfig() {
         ApocalypticConfiguration config = new ApocalypticConfiguration();
         try {
             config.load(new File(getDataFolder().getPath() + File.separator + "config.yml"));
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(Apocalyptic.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException | InvalidConfigurationException ex) {
-            Logger.getLogger(Apocalyptic.class.getName()).log(Level.SEVERE, null, ex);
-        } 
+            ex.printStackTrace();
+        }
         return config;
     }
     /**
@@ -425,14 +393,8 @@ public final class Apocalyptic extends JavaPlugin {
     				(cmd.equals("apocalyptic.reload") && p.hasPermission("apocalyptic.admin.reload"));
     	}
     	else {
-    		if (cmd.equals("radiation.other") || 
-    				cmd.equals("radiation.change") || 
-    				cmd.equals("apocalyptic.stop") ||
-    				cmd.equals("apocalyptic.reload")) {
-    			return ((Player) p).isOp();
-    		}
-    		return true;
-    	}
+            return !(cmd.equals("radiation.other") || cmd.equals("radiation.change") || cmd.equals("apocalyptic.stop") || cmd.equals("apocalyptic.reload")) || p.isOp();
+        }
     }
     private Plugin getWorldGuard() {
         Plugin plugin = getServer().getPluginManager().getPlugin("WorldGuard");
@@ -445,21 +407,48 @@ public final class Apocalyptic extends JavaPlugin {
         return plugin;
     }
     public void saveRadiation(Player p) throws SQLException {
-    	if (!db.isOpen())
-    		db.open();
-    	if (db.query("SELECT COUNT(*) AS exists FROM radiationLevels WHERE name=" + p.getName() + "").getInt("exists") > 0) { //$NON-NLS-3$
-            db.query("UPDATE radiationLevels SET level="+p.getMetadata(METADATA_KEY).get(0).asDouble()+" WHERE name=" + p.getName());
+    	db.open();
+        if (!p.getMetadata(METADATA_KEY).isEmpty()) {
+            if (db.query("SELECT COUNT(*) AS \"exists\" FROM radiationLevels WHERE player=\"" + p.getName() + "\";").getInt("exists") > 0) { //$NON-NLS-3$
+                db.query("UPDATE radiationLevels SET level="+p.getMetadata(METADATA_KEY).get(0).asDouble()+" WHERE player=\"" + p.getName()+"\";");
+            }
+            else {
+                db.query("INSERT INTO radiationLevels (player, level) VALUES (\"" + p.getName() + "\", " + p.getMetadata(METADATA_KEY).get(0).asDouble() + ");"); //$NON-NLS-3$
+            }
         }
-        else {
-            db.query("INSERT INTO radiationLevels (name, level) VALUES (" + p.getMetadata(METADATA_KEY).get(0).asDouble() + ", " + p.getName() + ")"); //$NON-NLS-3$
-        }
-    	//db.close();
-    }
-    public void closeDatabase() {
     	db.close();
+    }
+    public void loadRadiation(Player p) {
+
+        db.open();
+        ResultSet result = null;
+        try {
+            result = db.query("SELECT * FROM radiationLevels WHERE player=\""+p.getName()+"\"");
+            while (result.next()) {
+                p.setMetadata(Apocalyptic.METADATA_KEY, new FixedMetadataValue(this, result.getDouble("level")));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        db.close();
     }
 
 	public Messages getMessages() {
 		return messages;
 	}
+    public class ApocalypticConfiguration extends YamlConfiguration {
+        public void update(YamlConfiguration defaults) {
+            Map<String, Object> vals = this.getValues(true);
+            saveDefaultConfig();
+            for (String s : vals.keySet()) {
+                this.set(s, vals.get(s));
+            }
+        }
+        public ConfigurationSection getWorld(String world) {
+            return this.getConfigurationSection("worlds."+world);
+        }
+        public ConfigurationSection getWorld(World world) {
+            return this.getConfigurationSection("worlds."+world.getName());
+        }
+    }
 }

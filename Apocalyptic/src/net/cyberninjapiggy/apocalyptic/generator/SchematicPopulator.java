@@ -18,7 +18,7 @@ public class SchematicPopulator extends BlockPopulator {
 
 	public SchematicPopulator(Plugin p, String schemName, int chance) {
 		try {
-			this.schematic = new Schematic(p.getDataFolder().getAbsolutePath()+File.separator+"schematics"+File.separator+schemName);
+			this.schematic = Schematic.loadSchematic(new File(p.getDataFolder().getAbsolutePath()+File.separator+"schematics"+File.separator+schemName));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -30,10 +30,13 @@ public class SchematicPopulator extends BlockPopulator {
 		if (rand.nextInt(chance) != 0) {
 			return;
 		}
-		int xPos = chunk.getX()*16;
-		int zPos = chunk.getZ()*16;
+		int xPos = chunk.getX()*16 + rand.nextInt(16-schematic.getWidth());
+		int zPos = chunk.getZ()*16 + rand.nextInt(16-schematic.getLenght());
 		int yPos = world.getHighestBlockYAt(xPos, zPos);
-		schematic.paste(new Location(world, xPos, yPos, zPos));
+        if (yPos < 63) {
+            return;
+        }
+        Schematic.pasteSchematic(world, new Location(world, xPos, yPos, zPos), schematic);
 	}
 
 }

@@ -30,7 +30,6 @@ worlds:
           weakness: true
           slowness: true
           nausea: true
-#NYFI
 regions:
   fallout:
     - aRegionThatHasFallout
@@ -38,7 +37,7 @@ regions:
     - aRegionThatHasNoFallout
 meta:
   #Do not edit version
-  version: 2.2.10
+  version: 2.3.1
   version-check: true
   auto-update: true
   show-download-progress: true

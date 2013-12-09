@@ -74,7 +74,7 @@ public class MonsterSpawn implements Listener {
             if (a.getConfig().getBoolean("worlds." + e.getLocation().getWorld().getName() + ".mobs.mutants.skeleton")) {
                 if (a.rand.nextInt(100) == 0) {
                     ((Skeleton) e.getEntity()).setSkeletonType(Skeleton.SkeletonType.WITHER);
-                    ((Skeleton) e.getEntity()).getEquipment().setItemInHand(new ItemStack(Material.IRON_SWORD, 0));
+                    e.getEntity().getEquipment().setItemInHand(new ItemStack(Material.IRON_SWORD, 0));
                 }
             }
         }

@@ -34,10 +34,11 @@ public class RadiationCommandExecutor implements CommandExecutor {
                 if (args.length == 2) {
                     if (a.getServer().getPlayer(args[0]).isOnline()) {
                         if (isNumeric(args[1])) {
+                            sender.sendMessage("Set radiation");
                             a.setPlayerRadiation(a.getServer().getPlayer(args[0]), Double.parseDouble(args[1]));
                         }
                         else {
-                            sender.sendMessage(args[0] + " is not a valid number.");
+                            sender.sendMessage(args[1] + " is not a valid number.");
                         }
                     }
                     else {
@@ -51,6 +52,7 @@ public class RadiationCommandExecutor implements CommandExecutor {
                 }
                 if (args.length == 1 && a.canDoCommand((Player) sender, "radiation.other")) {
                     if (a.getServer().getPlayer(args[0]).isOnline()) {
+                        sender.sendMessage("Set radiation");
                         sendRadiationMessage(sender, a.getPlayerRadiation(a.getServer().getPlayer(args[0])));
                     }
                     else {
@@ -63,7 +65,7 @@ public class RadiationCommandExecutor implements CommandExecutor {
                             a.setPlayerRadiation(a.getServer().getPlayer(args[0]), Double.parseDouble(args[1]));
                         }
                         else {
-                            sender.sendMessage("" + args[0] + " is not a valid number.");
+                            sender.sendMessage("" + args[1] + " is not a valid number.");
                         }
                     }
                     else {

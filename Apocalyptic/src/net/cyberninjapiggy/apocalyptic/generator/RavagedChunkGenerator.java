@@ -112,10 +112,10 @@ public class RavagedChunkGenerator extends ChunkGenerator {
                     }
                     else {
                         if (y>128) {
-                            setBlock(x,(int)y,z,chunk,Material.GRAVEL);
+                            setBlock(x,y,z,chunk,Material.GRAVEL);
                         }
                         else if (y<world.getSeaLevel() - 12) {
-                            setBlock(x,(int)y,z,chunk,Material.SAND);
+                            setBlock(x,y,z,chunk,Material.SAND);
                         }
                         else {
                         	if (world.getBiome(realX, realZ) == Biome.MESA || world.getBiome(realX, realZ) == Biome.MESA_BRYCE) {
@@ -166,7 +166,7 @@ public class RavagedChunkGenerator extends ChunkGenerator {
 	        for (String s : schems) {
 	        	String name = s.split("@")[0];
 	        	int chance = Integer.parseInt(s.split("@")[1]);
-	        	pops.add(new SchematicPopulator(apocalyptic, name, chance));
+	        	pops.add(new SchematicPopulator(apocalyptic, name+".schematic", chance));
 	        }
         }
         

@@ -1,207 +1,160 @@
-package net.cyberninjapiggy.apocalyptic.misc;
-
-/*
- * The SCHEMATIC class. By Nathanael (thespuff.com/nathanaelphillipsmith@gmail.com)
- * 
- * Bits of this are from all over the place, I wish I'd kept a list of everybody who unwittingly helped out here.
- * I suppose I need to at least say 'thanks' to:
- * sk89q, who introduced me to the format.
- * bukkit.
- * Mojang.
- * 
- * Code snippets from Chris Smith,
- * 
- * I pulled this in from a PHP deconstructor, so you'll see some fragments of that.
- * If you clean this up or improve it, good for you. Pass it back to me, I'd love to learn from your work.
- * 
+package net.cyberninjapiggy.apocalyptic.misc;/*
+*
+*    This class is free software: you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation, either version 3 of the License, or
+*    (at your option) any later version.
+*
+*    This class is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this class.  If not, see <http://www.gnu.org/licenses/>.
+*
 */
 
+import com.sk89q.jnbt.*;
 import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
+import java.util.zip.GZIPInputStream;
 
-public class Schematic {
-	private int width;
-	private int height;
-	private int length;
-	public int offsetX;
-	public int offsetY;
-	public int offsetZ;
-	private List<Integer> bArray = new ArrayList<Integer>();
-	// Is it possible to make a List<byte> or something like that?
-	private List<Integer> dArray = new ArrayList<Integer>();
+/**
+ *
+ * @author Max
+ */
+public class Schematic
+{
 
-	
-	public Schematic(String fileName) throws IOException{
-		byte[] uGD;
-		try{
-			 uGD = file_get_contents(fileName);
-		} catch (IOException e) {
-			throw e;
-		}
-		
-		kludgy(uGD);
-	}
+    private byte[] blocks;
+    private byte[] data;
+    private short width;
+    private short lenght;
+    private short height;
 
-	
-	public Schematic(byte[] uGD) {
-		kludgy(uGD);
-	}
-
-	private void kludgy(byte[] uGD) {
-		//I know that this is kludgy. Let's fix it!
-		//Aren't schematics kept in NBTtag format?
-		//We should use the minecraft server functions.
-		
-		this.width = uGD[indexOf(uGD,"Width")+6];
-		this.height = uGD[indexOf(uGD,"Height")+7];
-		this.length = uGD[indexOf(uGD,"Length")+7];
-
-		this.offsetX = uGD[indexOf(uGD,"WEOffsetX")+10];
-		this.offsetY = uGD[indexOf(uGD,"WEOffsetY")+10];
-		this.offsetZ = uGD[indexOf(uGD,"WEOffsetZ")+10];
-
-		int bStart = indexOf(uGD,"Blocks")+10;
-		int dStart = indexOf(uGD,"Data")+8;
-		
-		int count = this.countBlocks();
-		
-       	for(int i = 0; i<count; i++){
-       		this.bArray.add((int) uGD[bStart+i]);
-       		this.dArray.add((int) uGD[dStart+i]);
-       	}
-	}
-	
-	private int indexOf(byte[] data, String pattern) {
-		return indexOf(data,pattern.getBytes());
-	}
-
-	public int indexOf(byte[] data, byte[] pattern) {
-		// * Knuth-Morris-Pratt Algorithm for Pattern Matching
-		// I got it from Chris Smith at velocityreviews.com
-		// based on code from fmi.uni-sofia.bg/fmi/logic/vboutchkova/sources/KMPMatch_java.html
-		int[] failure = computeFailure(pattern);
-
-		int j = 0;
-		if (data.length == 0) return -1;
-
-		for (int i = 0; i < data.length; i++) {
-			while (j > 0 && pattern[j] != data[i]) {
-				j = failure[j - 1];
-			}
-			if (pattern[j] == data[i]) { j++; }
-			if (j == pattern.length) {
-				return i - pattern.length + 1;
-			}
-		}
-		return -1;
-	}
-
-	private int[] computeFailure(byte[] pattern) {
-		int[] failure = new int[pattern.length];
-
-		int j = 0;
-		for (int i = 1; i < pattern.length; i++) {
-			while (j > 0 && pattern[j] != pattern[i]) {
-				j = failure[j - 1];
-			}
-			if (pattern[j] == pattern[i]) {
-				j++;
-			}
-			failure[i] = j;
-		}
-
-		return failure;
-	}
-		
-	public void paste(Location location){
-		for(int y=0; y<this.getHeight(); y++){
-			for(int x=0; x<this.getWidth(); x++){
-				for(int z=0; z<this.getLength(); z++){
-					final Material mBlock = this.getBlock(x, y, z);
-					final Block tBlock = location.getBlock().getRelative(x+this.offsetX, y+this.offsetY, z+this.offsetZ);
-					final byte dBlock = this.getData(x, y, z);
-					if((tBlock.getType() != mBlock)) {
-						tBlock.setTypeIdAndData(mBlock.getId(),dBlock,false);
-					}
-				}
-			}
-		}
-	}
-	
-	public byte[] file_get_contents(String message) throws IOException {
-		return file_get_contents(message, 4096);
-	}
-	
-	public byte[] file_get_contents(String fileName, int maxSize) throws IOException {
-        try {
-        	File schematicFile = new File(fileName);
-
-        	//I seem to remember that WE gzips schematic files to save them... Hm. Not my test files.
-        	//GZIPInputStream instream =new GZIPInputStream(new FileInputStream(schematicFile));
-        	FileInputStream instream = new FileInputStream(schematicFile);
-
-            byte[] buf = new byte[maxSize]; 
-            int len = instream.read(buf);
-        	instream.close();        	
-            if(len < 0) { return null; }
-            
-            byte[] fileData = new byte[len];
-           	for(int i = 0; i<len; i++){
-           		fileData[i] = buf[i];
-           	}
-        	
-        	return fileData;
-
-        } catch (IOException e) { throw e; }
+    public Schematic(byte[] blocks, byte[] data, short width, short lenght, short height)
+    {
+        this.blocks = blocks;
+        this.data = data;
+        this.width = width;
+        this.lenght = lenght;
+        this.height = height;
     }
 
-	public int countBlocks(){
-		//If we've already built the block array, use the size of that.
-		if(this.bArray.size()>0) { return this.bArray.size(); }
-		
-		//Otherwise, work it out from the width x height x length
-		if(this.width * this.height * this.length>0){
-			return (this.width * this.height * this.length);
-		}
-		
-		//Well, crap. Nothing else is working. Maybe the data array?
-		if(this.dArray.size()>0) { return this.dArray.size(); }
-		
-		//You, my friend, are out of luck.
-		return -1;
-	}
+    /**
+     * @return the blocks
+     */
+    public byte[] getBlocks()
+    {
+        return blocks;
+    }
 
-	public int getWidth(){
-		return this.width;
-	}
-	public int getHeight(){
-		return this.height;
-	}
-	public int getLength(){
-		return this.length;
-	}
+    /**
+     * @return the data
+     */
+    public byte[] getData()
+    {
+        return data;
+    }
 
-	public Material getBlock(int x, int y, int z){
-		return Material.getMaterial(this.bArray.get(xyzToLoc(x,y,z)));
-	}
+    /**
+     * @return the width
+     */
+    public short getWidth()
+    {
+        return width;
+    }
 
-	public int getBlockId(int x, int y, int z){
-		return this.bArray.get(xyzToLoc(x,y,z));
-	}
+    /**
+     * @return the lenght
+     */
+    public short getLenght()
+    {
+        return lenght;
+    }
 
-	public byte getData(int x, int y, int z){
-		return this.dArray.get(xyzToLoc(x,y,z)).byteValue();
-	}
+    /**
+     * @return the height
+     */
+    public short getHeight()
+    {
+        return height;
+    }
+    public static void pasteSchematic(World world, Location loc, Schematic schematic)
+    {
+        byte[] blocks = schematic.getBlocks();
+        byte[] blockData = schematic.getData();
 
-	private int xyzToLoc(int x, int y, int z){
-		return (((y*this.length)+z)*this.width)+x;
-	}
+        short length = schematic.getLenght();
+        short width = schematic.getWidth();
+        short height = schematic.getHeight();
 
+        for (int x = 0; x < width; ++x) {
+            for (int y = 0; y < height; ++y) {
+                for (int z = 0; z < length; ++z) {
+                    int index = y * width * length + z * width + x;
+                    Block block = new Location(world, x + loc.getX(), y + loc.getY(), z + loc.getZ()).getBlock();
+                    block.setTypeIdAndData(blocks[index], blockData[index], true);
+                }
+            }
+        }
+    }
+
+    public static Schematic loadSchematic(File file) throws IOException
+    {
+        FileInputStream stream = new FileInputStream(file);
+        NBTInputStream nbtStream = new NBTInputStream(new GZIPInputStream(stream));
+
+        CompoundTag schematicTag = (CompoundTag) nbtStream.readTag();
+        if (!schematicTag.getName().equals("Schematic")) {
+            throw new IllegalArgumentException("Tag \"Schematic\" does not exist or is not first");
+        }
+
+        Map<String, Tag> schematic = schematicTag.getValue();
+        if (!schematic.containsKey("Blocks")) {
+            throw new IllegalArgumentException("Schematic file is missing a \"Blocks\" tag");
+        }
+
+        short width = getChildTag(schematic, "Width", ShortTag.class).getValue();
+        short length = getChildTag(schematic, "Length", ShortTag.class).getValue();
+        short height = getChildTag(schematic, "Height", ShortTag.class).getValue();
+
+        String materials = getChildTag(schematic, "Materials", StringTag.class).getValue();
+        if (!materials.equals("Alpha")) {
+            throw new IllegalArgumentException("Schematic file is not an Alpha schematic");
+        }
+
+        byte[] blocks = getChildTag(schematic, "Blocks", ByteArrayTag.class).getValue();
+        byte[] blockData = getChildTag(schematic, "Data", ByteArrayTag.class).getValue();
+        return new Schematic(blocks, blockData, width, length, height);
+    }
+
+    /**
+     * Get child tag of a NBT structure.
+     *
+     * @param items The parent tag map
+     * @param key The name of the tag to get
+     * @param expected The expected type of the tag
+     * @return child tag casted to the expected type
+     * @throws com.sk89q.worldedit.data.DataException if the tag does not exist or the tag is not of the
+     * expected type
+     */
+    private static <T extends Tag> T getChildTag(Map<String, Tag> items, String key, Class<T> expected) throws IllegalArgumentException
+    {
+        if (!items.containsKey(key)) {
+            throw new IllegalArgumentException("Schematic file is missing a \"" + key + "\" tag");
+        }
+        Tag tag = items.get(key);
+        if (!expected.isInstance(tag)) {
+            throw new IllegalArgumentException(key + " tag is not of tag type " + expected.getName());
+        }
+        return expected.cast(tag);
+    }
 }
