@@ -13,12 +13,36 @@
             <id>bukkit-repo</id>
             <url>http://repo.bukkit.org/content/groups/public/</url>
         </repository>
+        <repository>
+            <id>dakani</id>
+            <name>Dakani Nexus Repo</name>
+            <url>http://repo.dakanilabs.com/content/repositories/public</url>
+        </repository>
+            <repository>
+                <id>sk89q-repo</id>
+                <url>http://maven.sk89q.com/repo/</url>
+            </repository>
     </repositories>
     <dependencies>
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>bukkit</artifactId>
             <version>1.7.2-R0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>lib.PatPeter.SQLibrary</groupId>
+            <artifactId>SQLibrary</artifactId>
+            <version>6.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sk89q</groupId>
+            <artifactId>worldedit</artifactId>
+            <version>5.5.8-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sk89q</groupId>
+            <artifactId>worldguard</artifactId>
+            <version>5.8.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
