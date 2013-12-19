@@ -361,7 +361,7 @@ public final class Apocalyptic extends JavaPlugin {
         if (!getConfig().getBoolean("worlds."+p.getWorld().getName() + ".texturepack")) {
             return;
         }
-        p.setTexturePack(texturePack);
+        p.setResourcePack(texturePack);
     }
     @Override
     public ApocalypticConfiguration getConfig() {
