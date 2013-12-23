@@ -1,6 +1,6 @@
-name: Apocalyptic
+name: @name@
 main: net.cyberninjapiggy.apocalyptic.Apocalyptic
-version: 2.3.1
+version: @version@
 author: awesomefacecreeper
 description: Apocalyptic world generator, radiation manager, zombie apocalypses and more.
 load: startup
@@ -15,4 +15,4 @@ commands:
   apocalyptic:
     description: Plugin Management
     usage: /apocalyptic <reload|stop|radiation>
-    aliases: [apoc, a]
+    aliases: [apoc]

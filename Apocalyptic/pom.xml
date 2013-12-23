@@ -6,7 +6,7 @@
 
     <groupId>net.cyberninjapiggy</groupId>
     <artifactId>Apocalyptic</artifactId>
-    <version>2.3.1</version>
+    <version>2.3.2</version>
 
     <repositories>
         <repository>
@@ -49,6 +49,39 @@
     <build>
         <finalName>Apocalyptic</finalName>
         <sourceDirectory>/src/main/java</sourceDirectory>
+        <plugins>
+            <plugin>
+                <groupId>com.google.code.maven-replacer-plugin</groupId>
+                <artifactId>replacer</artifactId>
+                <version>1.5.2</version>
+                <executions>
+                    <execution>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>replace</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <includes>
+                        <include>${basedir}/src/main/resources/*.yml</include>
+                    </includes>
+                    <replacements>
+                        <replacement>
+                            <token>version</token>
+                            <value>${project.version}</value>
+                        </replacement>
+                        <replacement>
+                            <token>name</token>
+                            <value>${project.name}</value>
+                        </replacement>
+                    </replacements>
+                    <delimiters>
+                        <delimiter>@</delimiter>
+                    </delimiters>
+                </configuration>
+            </plugin>
+        </plugins>
         <resources>
             <resource>
                 <targetPath>.</targetPath>
