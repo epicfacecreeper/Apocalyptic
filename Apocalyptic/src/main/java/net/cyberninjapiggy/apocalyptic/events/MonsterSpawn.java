@@ -48,9 +48,10 @@ public class MonsterSpawn implements Listener {
                 for (int i=0;i<hordeSize;) {
                     int spotX = 7-a.rand.nextInt(14);
                     int spotZ = 7-a.rand.nextInt(14);
-                    Location spawnPoint = l.add(spotX, 0, spotZ);
-                    spawnPoint.setY(l.getWorld().getHighestBlockYAt(spotX, spotZ));
-                    if (!ZombieHelper.canZombieSpawn(spawnPoint) && failedAttempts <= 10) {
+                    int spotY = 3-a.rand.nextInt(6);
+                    Location spawnPoint = l.add(spotX, spotY, spotZ);
+                    //spawnPoint.setY(l.getWorld().getHighestBlockYAt(spotX, spotZ));
+                    if (!ZombieHelper.canZombieSpawn(spawnPoint) && failedAttempts <= 20) {
                     	failedAttempts++;
                     	continue;
                     }
