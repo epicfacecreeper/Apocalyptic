@@ -73,7 +73,7 @@ public final class Apocalyptic extends JavaPlugin {
     private boolean wgEnabled = true;
     private Messages messages;
     
-    private static final String texturePack = "https://dl.dropboxusercontent.com/s/qilofl4m4e9uvxh/apocalyptic-1.6.zip?dl=1";
+    private static final String texturePack = "https://www.dropbox.com/s/waiut1qz722uojh/apocalyptic%20texture%20pack.zip?dl=1";
     
     public static final String METADATA_KEY = "radiation";
     
