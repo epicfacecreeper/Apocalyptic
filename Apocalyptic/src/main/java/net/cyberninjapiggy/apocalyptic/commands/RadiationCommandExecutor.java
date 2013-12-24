@@ -27,14 +27,18 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.text.DecimalFormat;
+
 /**
  *
  * @author Nick
  */
 public class RadiationCommandExecutor implements CommandExecutor {
     private final Apocalyptic a;
+    private final DecimalFormat fmt;
     public RadiationCommandExecutor(Apocalyptic a) {
         this.a = a;
+        fmt = new DecimalFormat("0.#");
     }
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args){
@@ -72,7 +76,7 @@ public class RadiationCommandExecutor implements CommandExecutor {
                 }
                 if (args.length == 1 && a.canDoCommand((Player) sender, "radiation.other")) {
                     if (a.getServer().getPlayer(args[0]).isOnline()) {
-                        sender.sendMessage("Set radiation");
+
                         sendRadiationMessage(sender, a.getPlayerRadiation(a.getServer().getPlayer(args[0])));
                     }
                     else {
@@ -82,6 +86,7 @@ public class RadiationCommandExecutor implements CommandExecutor {
                 if (args.length == 2 && a.canDoCommand((Player) sender, "radiation.change")) {
                     if (a.getServer().getPlayer(args[0]).isOnline()) {
                         if (isNumeric(args[1])) {
+                            sender.sendMessage("Set radiation");
                             a.setPlayerRadiation(a.getServer().getPlayer(args[0]), Double.parseDouble(args[1]));
                         }
                         else {
@@ -119,6 +124,6 @@ public class RadiationCommandExecutor implements CommandExecutor {
             color = ChatColor.BLACK;
         }
         
-        s.sendMessage(color +""+ radiation + " " + a.getMessages().getCaption("grays"));
+        s.sendMessage(color +""+ fmt.format(radiation) + " " + a.getMessages().getCaption("grays"));
     }
 }

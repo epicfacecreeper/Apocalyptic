@@ -326,28 +326,28 @@ public final class Apocalyptic extends JavaPlugin {
         
         if (getPlayerRadiation(p) >= 0.8 && getPlayerRadiation(p) < 1.0) {
             p.sendMessage(new String[] {
-                ChatColor.RED + getMessages().getCaption("warning") + ChatColor.GOLD + getMessages().getCaption("radiationCriticalWarning") ,
-                ChatColor.RED + getMessages().getCaption("warning") + ChatColor.GOLD + getMessages().getCaption("radBloodWarning") });
+                ChatColor.RED + getMessages().getCaption("warning") +" "+ ChatColor.GOLD + getMessages().getCaption("radiationCriticalWarning") ,
+                ChatColor.RED + getMessages().getCaption("warning") +" "+ ChatColor.GOLD + getMessages().getCaption("radBloodWarning") });
         }
         if (getPlayerRadiation(p) >= 1.0 && getPlayerRadiation(p) < 6.0) {
             p.sendMessage(new String[] {
-                ChatColor.RED + getMessages().getCaption("warning") + ChatColor.GOLD + getMessages().getCaption("radDangerLevel") , 
-                ChatColor.RED + getMessages().getCaption("warning") + ChatColor.GOLD + getMessages().getCaption("radBlood") ,
-                ChatColor.RED + getMessages().getCaption("warning") + ChatColor.GOLD + getMessages().getCaption("takemoredamage") 
+                ChatColor.RED + getMessages().getCaption("warning") +" "+ ChatColor.GOLD + getMessages().getCaption("radDangerLevel") ,
+                ChatColor.RED + getMessages().getCaption("warning") +" "+ ChatColor.GOLD + getMessages().getCaption("radBlood") ,
+                ChatColor.RED + getMessages().getCaption("warning") +" "+ ChatColor.GOLD + getMessages().getCaption("takemoredamage")
             });
         }
         if (getPlayerRadiation(p) >= 6.0 && getPlayerRadiation(p) < 10.0) {
             p.sendMessage(new String[] {
-                ChatColor.RED + getMessages().getCaption("warning") + ChatColor.GOLD + getMessages().getCaption("radiationCritical") , 
-                ChatColor.RED + getMessages().getCaption("warning") + ChatColor.GOLD + getMessages().getCaption("radBloodStomach") ,
-            ChatColor.RED + getMessages().getCaption("warning") + ChatColor.GOLD + getMessages().getCaption("takeMoreDamageandNoEat") 
+                ChatColor.RED + getMessages().getCaption("warning") +" "+ ChatColor.GOLD + getMessages().getCaption("radiationCritical") ,
+                ChatColor.RED + getMessages().getCaption("warning") +" "+ ChatColor.GOLD + getMessages().getCaption("radBloodStomach") ,
+            ChatColor.RED + getMessages().getCaption("warning") +" "+ ChatColor.GOLD + getMessages().getCaption("takeMoreDamageandNoEat")
             });
         }
         if (getPlayerRadiation(p) >= 10) {
             p.sendMessage(new String[] {
-                ChatColor.RED + getMessages().getCaption("warning") + ChatColor.GOLD + getMessages().getCaption("radDeadly") , 
-                ChatColor.RED + getMessages().getCaption("warning") + ChatColor.GOLD + getMessages().getCaption("radAll") ,
-            ChatColor.RED + getMessages().getCaption("warning") + ChatColor.GOLD + getMessages().getCaption("radAllExplain") 
+                ChatColor.RED + getMessages().getCaption("warning") +" "+ ChatColor.GOLD + getMessages().getCaption("radDeadly") ,
+                ChatColor.RED + getMessages().getCaption("warning") +" "+ ChatColor.GOLD + getMessages().getCaption("radAll") ,
+            ChatColor.RED + getMessages().getCaption("warning") +" "+ ChatColor.GOLD + getMessages().getCaption("radAllExplain")
             });
         }
         

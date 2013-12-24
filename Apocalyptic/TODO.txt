@@ -1,0 +1,1 @@
+Allow non-hazmat armor to be crafted with hazmat armor to make Hazmat T armor
