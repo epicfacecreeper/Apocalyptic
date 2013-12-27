@@ -42,6 +42,7 @@ import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
+import org.bukkit.inventory.ShapelessRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
@@ -105,7 +106,6 @@ public final class Apocalyptic extends JavaPlugin {
         }
         messages.saveDefault();
         if (!new File(getDataFolder().getPath() + File.separator + "config.yml").exists()) {
-        	getConfig().options().copyDefaults(true);
             saveDefaultConfig();
         }
         else {
@@ -184,6 +184,21 @@ public final class Apocalyptic extends JavaPlugin {
         ShapedRecipe hazardBootsR = new ShapedRecipe(hazmatBoots);
         hazardBootsR.shape("S S", "S S");
         hazardBootsR.setIngredient('S', Material.SPONGE);
+        int start = 306;
+        //Loop through iron/diamond/gold (i*4)+(4-j)
+        for (int i=0;i<=3;i++) {
+            //Loop through pieces of the armor in the set
+            for (int j=0;j<=3;j++) {
+                int mId = start+(i*4)+j;
+                Material mat = Material.getMaterial(mId);
+                ShapelessRecipe recipe = new ShapelessRecipe(setName(new ItemStack(mat), ChatColor.RESET+"Hazmat " + mat.name()));
+                recipe.addIngredient(mat);
+                Material chain = Material.getMaterial(start-4+j);
+                recipe.addIngredient(chain);
+
+                getServer().addRecipe(recipe);
+            }
+        }
         
         getServer().addRecipe(hazardBootsR);
         getServer().addRecipe(hazardPantsR);
@@ -459,8 +474,12 @@ public final class Apocalyptic extends JavaPlugin {
     public class ApocalypticConfiguration extends YamlConfiguration {
         public void update(YamlConfiguration defaults) {
             Map<String, Object> vals = this.getValues(true);
+            new File(Apocalyptic.this.getDataFolder().getAbsolutePath()+File.separator+"config.yml").delete();
             saveDefaultConfig();
             for (String s : vals.keySet()) {
+                if (s.equals("meta.version")) {
+                    continue;
+                }
                 this.set(s, vals.get(s));
             }
         }
