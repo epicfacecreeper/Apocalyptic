@@ -29,6 +29,7 @@ import net.cyberninjapiggy.apocalyptic.commands.ApocalypticCommandExecutor;
 import net.cyberninjapiggy.apocalyptic.commands.RadiationCommandExecutor;
 import net.cyberninjapiggy.apocalyptic.events.*;
 import net.cyberninjapiggy.apocalyptic.generator.RavagedChunkGenerator;
+import net.cyberninjapiggy.apocalyptic.misc.ApocalypticConfiguration;
 import net.cyberninjapiggy.apocalyptic.misc.Messages;
 import net.cyberninjapiggy.apocalyptic.misc.Updater;
 import org.bukkit.*;
@@ -81,6 +82,9 @@ public final class Apocalyptic extends JavaPlugin {
     public static ItemStack hazmatSuit;
     public static ItemStack hazmatPants;
     public static ItemStack hazmatBoots;
+
+    private ApocalypticConfiguration cachedConfig;
+    private boolean recacheConfig;
     
     
     @Override
@@ -115,7 +119,7 @@ public final class Apocalyptic extends JavaPlugin {
                 } catch (IOException | InvalidConfigurationException ex) {
                     ex.printStackTrace();
                 }
-                getConfig().update(defaults);
+                getConfig().update(this);
             }
         }
         db = new SQLite(log, getMessages().getCaption("logtitle"), getDataFolder().getAbsolutePath(), "apocalyptic");
@@ -342,8 +346,10 @@ public final class Apocalyptic extends JavaPlugin {
     public void addPlayerRadiation(Player p, double level) {
     	
     	//p.setMetadata(METADATA_KEY, new FixedMetadataValue(p.getMetadata(METADATA_KEY).g));
+        double oldRadiation = 0;
     	if (p.getMetadata(METADATA_KEY).size() > 0) {
-    		p.setMetadata(METADATA_KEY, new FixedMetadataValue(this, p.getMetadata(METADATA_KEY).get(0).asDouble()+level));
+            oldRadiation = p.getMetadata(METADATA_KEY).get(0).asDouble();
+    		p.setMetadata(METADATA_KEY, new FixedMetadataValue(this, oldRadiation+level));
     	}
     	else {
     		p.setMetadata(METADATA_KEY, new FixedMetadataValue(this, level));
@@ -354,21 +360,21 @@ public final class Apocalyptic extends JavaPlugin {
                 ChatColor.RED + getMessages().getCaption("warning") +" "+ ChatColor.GOLD + getMessages().getCaption("radiationCriticalWarning") ,
                 ChatColor.RED + getMessages().getCaption("warning") +" "+ ChatColor.GOLD + getMessages().getCaption("radBloodWarning") });
         }
-        if (getPlayerRadiation(p) >= 1.0 && getPlayerRadiation(p) < 6.0) {
+        if (oldRadiation < 1.0 && getPlayerRadiation(p) >= 1.0 && getPlayerRadiation(p) < 6.0) {
             p.sendMessage(new String[] {
                 ChatColor.RED + getMessages().getCaption("warning") +" "+ ChatColor.GOLD + getMessages().getCaption("radDangerLevel") ,
                 ChatColor.RED + getMessages().getCaption("warning") +" "+ ChatColor.GOLD + getMessages().getCaption("radBlood") ,
                 ChatColor.RED + getMessages().getCaption("warning") +" "+ ChatColor.GOLD + getMessages().getCaption("takemoredamage")
             });
         }
-        if (getPlayerRadiation(p) >= 6.0 && getPlayerRadiation(p) < 10.0) {
+        if (oldRadiation < 6.0 && getPlayerRadiation(p) >= 6.0 && getPlayerRadiation(p) < 10.0) {
             p.sendMessage(new String[] {
                 ChatColor.RED + getMessages().getCaption("warning") +" "+ ChatColor.GOLD + getMessages().getCaption("radiationCritical") ,
                 ChatColor.RED + getMessages().getCaption("warning") +" "+ ChatColor.GOLD + getMessages().getCaption("radBloodStomach") ,
             ChatColor.RED + getMessages().getCaption("warning") +" "+ ChatColor.GOLD + getMessages().getCaption("takeMoreDamageandNoEat")
             });
         }
-        if (getPlayerRadiation(p) >= 10) {
+        if (oldRadiation < 10.0 && getPlayerRadiation(p) >= 10) {
             p.sendMessage(new String[] {
                 ChatColor.RED + getMessages().getCaption("warning") +" "+ ChatColor.GOLD + getMessages().getCaption("radDeadly") ,
                 ChatColor.RED + getMessages().getCaption("warning") +" "+ ChatColor.GOLD + getMessages().getCaption("radAll") ,
@@ -410,13 +416,19 @@ public final class Apocalyptic extends JavaPlugin {
     }
     @Override
     public ApocalypticConfiguration getConfig() {
-        ApocalypticConfiguration config = new ApocalypticConfiguration();
-        try {
-            config.load(new File(getDataFolder().getPath() + File.separator + "config.yml"));
-        } catch (IOException | InvalidConfigurationException ex) {
-            ex.printStackTrace();
+        if (cachedConfig == null || recacheConfig) {
+            ApocalypticConfiguration config = new ApocalypticConfiguration();
+            try {
+                config.load(new File(getDataFolder().getPath() + File.separator + "config.yml"));
+            } catch (IOException | InvalidConfigurationException ex) {
+                ex.printStackTrace();
+            }
+            cachedConfig = config;
+            return config;
         }
-        return config;
+        else {
+            return cachedConfig;
+        }
     }
     /**
      * 
@@ -481,23 +493,5 @@ public final class Apocalyptic extends JavaPlugin {
 	public Messages getMessages() {
 		return messages;
 	}
-    public class ApocalypticConfiguration extends YamlConfiguration {
-        public void update(YamlConfiguration defaults) {
-            Map<String, Object> vals = this.getValues(true);
-            new File(Apocalyptic.this.getDataFolder().getAbsolutePath()+File.separator+"config.yml").delete();
-            saveDefaultConfig();
-            for (String s : vals.keySet()) {
-                if (s.equals("meta.version")) {
-                    continue;
-                }
-                this.set(s, vals.get(s));
-            }
-        }
-        public ConfigurationSection getWorld(String world) {
-            return this.getConfigurationSection("worlds."+world);
-        }
-        public ConfigurationSection getWorld(World world) {
-            return getWorld(world.getName());
-        }
-    }
+
 }
