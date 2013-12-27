@@ -51,12 +51,10 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
 import java.util.logging.Level;
@@ -73,7 +71,8 @@ public final class Apocalyptic extends JavaPlugin {
     private Plugin wg;
     private boolean wgEnabled = true;
     private Messages messages;
-    
+
+    private static final int dboId = 43663;
     private static final String texturePack = "https://www.dropbox.com/s/waiut1qz722uojh/apocalyptic%20texture%20pack.zip?dl=1";
     
     public static final String METADATA_KEY = "radiation";
@@ -140,10 +139,10 @@ public final class Apocalyptic extends JavaPlugin {
         
         
         if (getConfig().getBoolean("meta.version-check")) {
-        	Updater versionCheck = new Updater(this, 43663, this.getFile(), Updater.UpdateType.NO_DOWNLOAD, false);
+        	Updater versionCheck = new Updater(this, dboId, this.getFile(), Updater.UpdateType.NO_DOWNLOAD, false);
         	if (!versionCheck.getLatestName().equals(this.getDescription().getName() + " v" + this.getDescription().getVersion())) {
         		if (getConfig().getBoolean("meta.auto-update")) {
-        			new Updater(this, 43663, this.getFile(), Updater.UpdateType.NO_VERSION_CHECK, getConfig().getBoolean("meta.show-download-progress"));
+        			new Updater(this, dboId, this.getFile(), Updater.UpdateType.NO_VERSION_CHECK, getConfig().getBoolean("meta.show-download-progress"));
         		}
         		else {
         			log.info(ChatColor.GREEN + getMessages().getCaption("updateAvaliable") + versionCheck.getLatestName()); //$NON-NLS-3$
@@ -185,7 +184,7 @@ public final class Apocalyptic extends JavaPlugin {
         hazardBootsR.shape("S S", "S S");
         hazardBootsR.setIngredient('S', Material.SPONGE);
         int start = 306;
-        //Loop through iron/diamond/gold (i*4)+(4-j)
+        //Loop through iron/diamond/gold
         for (int i=0;i<=3;i++) {
             //Loop through pieces of the armor in the set
             for (int j=0;j<=3;j++) {
@@ -198,6 +197,17 @@ public final class Apocalyptic extends JavaPlugin {
 
                 getServer().addRecipe(recipe);
             }
+        }
+        start = 298;
+        for (int j=0;j<=3;j++) {
+            int mId = start+j;
+            Material mat = Material.getMaterial(mId);
+            ShapelessRecipe recipe = new ShapelessRecipe(setName(new ItemStack(mat), ChatColor.RESET+"Hazmat " + mat.name()));
+            recipe.addIngredient(mat);
+            Material chain = Material.getMaterial(start+4);
+            recipe.addIngredient(chain);
+
+            getServer().addRecipe(recipe);
         }
         
         getServer().addRecipe(hazardBootsR);
@@ -456,7 +466,7 @@ public final class Apocalyptic extends JavaPlugin {
     public void loadRadiation(Player p) {
 
         db.open();
-        ResultSet result = null;
+        ResultSet result;
         try {
             result = db.query("SELECT * FROM radiationLevels WHERE player=\""+p.getName()+"\"");
             while (result.next()) {
@@ -487,7 +497,7 @@ public final class Apocalyptic extends JavaPlugin {
             return this.getConfigurationSection("worlds."+world);
         }
         public ConfigurationSection getWorld(World world) {
-            return this.getConfigurationSection("worlds."+world.getName());
+            return getWorld(world.getName());
         }
     }
 }

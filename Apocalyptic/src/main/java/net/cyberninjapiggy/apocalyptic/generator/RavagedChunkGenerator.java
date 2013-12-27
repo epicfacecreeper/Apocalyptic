@@ -53,7 +53,7 @@ public class RavagedChunkGenerator extends ChunkGenerator {
             return;
         try {
             chunk[y >> 4][((y & 0xF) << 8) | (z << 4) | x] = (byte) material.getId();
-        } catch (Exception e) {}
+        } catch (Exception e) {e.printStackTrace();}
 }
     @Override
     public byte[][] generateBlockSections(World world, Random rand, int ChunkX, int ChunkZ, BiomeGrid biome) {
