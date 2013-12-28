@@ -413,6 +413,7 @@ public final class Apocalyptic extends JavaPlugin {
     @Override
     public ApocalypticConfiguration getConfig() {
         if (cachedConfig == null || recacheConfig) {
+            recacheConfig = false;
             ApocalypticConfiguration config = new ApocalypticConfiguration();
             try {
                 config.load(new File(getDataFolder().getPath() + File.separator + "config.yml"));
@@ -489,5 +490,8 @@ public final class Apocalyptic extends JavaPlugin {
 	public Messages getMessages() {
 		return messages;
 	}
+    public void reloadConfig() {
+        recacheConfig = true;
+    }
 
 }
