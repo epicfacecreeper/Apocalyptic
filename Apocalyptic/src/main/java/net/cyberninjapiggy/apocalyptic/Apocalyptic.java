@@ -32,6 +32,7 @@ import net.cyberninjapiggy.apocalyptic.generator.RavagedChunkGenerator;
 import net.cyberninjapiggy.apocalyptic.misc.ApocalypticConfiguration;
 import net.cyberninjapiggy.apocalyptic.misc.Messages;
 import net.cyberninjapiggy.apocalyptic.misc.Updater;
+import net.cyberninjapiggy.apocalyptic.misc.Util;
 import org.bukkit.*;
 import org.bukkit.World.Environment;
 import org.bukkit.command.CommandSender;
@@ -188,7 +189,7 @@ public final class Apocalyptic extends JavaPlugin {
             for (int j=0;j<=3;j++) {
                 int mId = start+(i*4)+j;
                 Material mat = Material.getMaterial(mId);
-                ShapelessRecipe recipe = new ShapelessRecipe(setName(new ItemStack(mat), ChatColor.RESET+"Hazmat " + mat.name()));
+                ShapelessRecipe recipe = new ShapelessRecipe(setName(new ItemStack(mat), ChatColor.RESET+messages.getCaption("hazmat")+" "+ Util.title(mat.name().replace("_", " ").toLowerCase())));
                 recipe.addIngredient(mat);
                 Material chain = Material.getMaterial(start-4+j);
                 recipe.addIngredient(chain);
@@ -200,10 +201,11 @@ public final class Apocalyptic extends JavaPlugin {
         for (int j=0;j<=3;j++) {
             int mId = start+j;
             Material mat = Material.getMaterial(mId);
-            ShapelessRecipe recipe = new ShapelessRecipe(setName(new ItemStack(mat), ChatColor.RESET+"Hazmat " + mat.name()));
+            ShapelessRecipe recipe = new ShapelessRecipe(setName(new ItemStack(mat), ChatColor.RESET+messages.getCaption("hazmat")+" " + Util.title(mat.name().replace("_", " ").toLowerCase())));
             recipe.addIngredient(mat);
-            Material chain = Material.getMaterial(start+4);
+            Material chain = Material.getMaterial(mId+4);
             recipe.addIngredient(chain);
+            //log.info(chain.name() + " " + mat.name());
 
             getServer().addRecipe(recipe);
         }
@@ -326,10 +328,10 @@ public final class Apocalyptic extends JavaPlugin {
      */
     public boolean playerWearingHazmatSuit(Player p) {
         EntityEquipment e = p.getEquipment();
-        boolean helmet =  e.getHelmet() != null && e.getHelmet().getType() == Material.CHAINMAIL_HELMET && e.getHelmet().getItemMeta().getDisplayName().equals(ChatColor.RESET + getMessages().getCaption("gasMask"));
-        boolean chest =  e.getChestplate() != null && e.getChestplate().getType() == Material.CHAINMAIL_CHESTPLATE && e.getChestplate().getItemMeta().getDisplayName().equals(ChatColor.RESET + getMessages().getCaption("hazmatSuit"));
-        boolean legs =  e.getLeggings() != null && e.getLeggings().getType() == Material.CHAINMAIL_LEGGINGS && e.getLeggings().getItemMeta().getDisplayName().equals(ChatColor.RESET + getMessages().getCaption("hazmatPants"));
-        boolean boots =  e.getBoots() != null && e.getBoots().getType() == Material.CHAINMAIL_BOOTS && e.getBoots().getItemMeta().getDisplayName().equals(ChatColor.RESET + getMessages().getCaption("hazmatBoots"));
+        boolean helmet =  e.getHelmet() != null && (e.getHelmet().getItemMeta().getDisplayName().startsWith(ChatColor.RESET + getMessages().getCaption("gasMask")) || e.getHelmet().getItemMeta().getDisplayName().startsWith(ChatColor.RESET + getMessages().getCaption("hazmat")));
+        boolean chest =  e.getChestplate() != null && e.getChestplate().getItemMeta().getDisplayName().startsWith(ChatColor.RESET + getMessages().getCaption("hazmat"));
+        boolean legs =  e.getLeggings() != null && e.getLeggings().getItemMeta().getDisplayName().startsWith(ChatColor.RESET + getMessages().getCaption("hazmat"));
+        boolean boots =  e.getBoots() != null && e.getBoots().getItemMeta().getDisplayName().startsWith(ChatColor.RESET + getMessages().getCaption("hazmat"));
         return helmet && chest && legs && boots;
     }
     /**

@@ -27,7 +27,8 @@ import org.bukkit.plugin.Plugin;
 
 import java.io.File;
 import java.io.InputStream;
- 
+import java.util.Map;
+
 public class Messages {
 	private Plugin plugin = null;
 	 
@@ -61,6 +62,14 @@ public class Messages {
 		{
 			this.plugin.saveResource("lang.yml", false);
 		}
+        else {
+            Map<String, Object> vals = config.getValues(true);
+            configFile.delete();
+            this.plugin.saveResource("lang.yml", false);
+            for (String s : vals.keySet()) {
+                config.set(s, vals.get(s));
+            }
+        }
 	}
 	 
 	public String getCaption(String name)
@@ -82,8 +91,5 @@ public class Messages {
 			caption = ChatColor.translateAlternateColorCodes('&', caption);
 		}
 		return caption;
-	}
-	public String getString(String msg) {
-		return getCaption(msg);
 	}
 }
