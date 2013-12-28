@@ -113,12 +113,6 @@ public final class Apocalyptic extends JavaPlugin {
         }
         else {
             if (!getConfig().getString("meta.version").equals(this.getDescription().getVersion())) {
-                YamlConfiguration defaults = new YamlConfiguration();
-                try {
-                    defaults.load(this.getClassLoader().getResourceAsStream("config.yml"));
-                } catch (IOException | InvalidConfigurationException ex) {
-                    ex.printStackTrace();
-                }
                 getConfig().update(this);
             }
         }

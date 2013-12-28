@@ -1,11 +1,11 @@
-maxRadiationWashable: 1
+maxRadiationWashable: 1.5
 radiationCures:
   - GOLDEN_APPLE
 worlds:
   world:
     radiationRate: 0.1
     radiationTop: 120
-    radiationBottom: 50
+    radiationBottom: 40
     texturepack: true
     fallout: true
     zombie: true

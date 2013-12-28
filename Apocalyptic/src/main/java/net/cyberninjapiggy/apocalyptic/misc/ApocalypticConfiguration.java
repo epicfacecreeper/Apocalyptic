@@ -19,7 +19,6 @@
 */
 package net.cyberninjapiggy.apocalyptic.misc;
 
-import net.cyberninjapiggy.apocalyptic.Apocalyptic;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -42,6 +41,7 @@ public class ApocalypticConfiguration extends YamlConfiguration {
             }
             this.set(s, vals.get(s));
         }
+        //plugin.saveConfig();
     }
     public ConfigurationSection getWorld(String world) {
         return this.getConfigurationSection("worlds."+world);
