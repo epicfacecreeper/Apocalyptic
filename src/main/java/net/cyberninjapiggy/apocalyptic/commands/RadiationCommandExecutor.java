@@ -49,7 +49,7 @@ public class RadiationCommandExecutor implements CommandExecutor {
                 }
                 if (args.length == 1) {
                     if (a.getServer().getPlayer(args[0]).isOnline()) {
-                        sendRadiationMessage(sender, a.getPlayerRadiation(a.getServer().getPlayer(args[0])));
+                        sendRadiationMessage(sender, a.getRadiationManager().getPlayerRadiation(a.getServer().getPlayer(args[0])));
                     }
                     else {
                         sender.sendMessage("Cannot find player \"" + args[0] + "\"");
@@ -59,7 +59,7 @@ public class RadiationCommandExecutor implements CommandExecutor {
                     if (a.getServer().getPlayer(args[0]).isOnline()) {
                         if (isNumeric(args[1])) {
                             sender.sendMessage("Set radiation");
-                            a.setPlayerRadiation(a.getServer().getPlayer(args[0]), Double.parseDouble(args[1]));
+                            a.getRadiationManager().setPlayerRadiation(a.getServer().getPlayer(args[0]), Double.parseDouble(args[1]));
                         }
                         else {
                             sender.sendMessage(args[1] + " is not a valid number.");
@@ -72,12 +72,12 @@ public class RadiationCommandExecutor implements CommandExecutor {
             }
             else {
                 if (args.length == 0 && a.canDoCommand((Player) sender, "radiation.self")) {
-                    sendRadiationMessage(sender, a.getPlayerRadiation((Player) sender));
+                    sendRadiationMessage(sender, a.getRadiationManager().getPlayerRadiation((Player) sender));
                 }
                 if (args.length == 1 && a.canDoCommand((Player) sender, "radiation.other")) {
                     if (a.getServer().getPlayer(args[0]).isOnline()) {
 
-                        sendRadiationMessage(sender, a.getPlayerRadiation(a.getServer().getPlayer(args[0])));
+                        sendRadiationMessage(sender, a.getRadiationManager().getPlayerRadiation(a.getServer().getPlayer(args[0])));
                     }
                     else {
                         sender.sendMessage("Cannot find player \"" + args[0] + "\"");
@@ -87,7 +87,7 @@ public class RadiationCommandExecutor implements CommandExecutor {
                     if (a.getServer().getPlayer(args[0]).isOnline()) {
                         if (isNumeric(args[1])) {
                             sender.sendMessage("Set radiation");
-                            a.setPlayerRadiation(a.getServer().getPlayer(args[0]), Double.parseDouble(args[1]));
+                            a.getRadiationManager().setPlayerRadiation(a.getServer().getPlayer(args[0]), Double.parseDouble(args[1]));
                         }
                         else {
                             sender.sendMessage("" + args[1] + " is not a valid number.");

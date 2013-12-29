@@ -39,7 +39,12 @@ import java.util.Random;
  * @author Nick
  */
 public class AbandonedHousePopulator extends BlockPopulator {
-    Map<ItemStack, Integer> lootTable = new HashMap<>();
+    private Apocalyptic plugin;
+    private Map<ItemStack, Integer> lootTable = new HashMap<>();
+
+    public AbandonedHousePopulator(Apocalyptic plugin) {
+        this.plugin = plugin;
+    }
 
     @Override
     public void populate(World world, Random rand, Chunk chunk) {
@@ -195,13 +200,14 @@ public class AbandonedHousePopulator extends BlockPopulator {
         }
     }
     public void genLootTable(Random rand) {
-    	lootTable.put(Apocalyptic.hazmatBoots, 2);
-        lootTable.put(Apocalyptic.hazmatPants, 2);
-        lootTable.put(Apocalyptic.hazmatSuit, 2);
-        lootTable.put(Apocalyptic.hazmatHood, 2);
+    	lootTable.put(plugin.getHazmatBoots(), 2);
+        lootTable.put(plugin.getHazmatPants(), 2);
+        lootTable.put(plugin.getHazmatSuit(), 2);
+        lootTable.put(plugin.getHazmatHood(), 2);
         lootTable.put(new ItemStack(Material.SPONGE, rand.nextInt(4) + 1), 1);
         lootTable.put(new ItemStack(Material.SADDLE, 1), 1);
         lootTable.put(new ItemStack(Material.OBSIDIAN, rand.nextInt(4) + 1), 4);
         lootTable.put(new ItemStack(Material.LAVA_BUCKET), 5);
+        lootTable.put(new ItemStack(Material.SUGAR_CANE), 4);
     }
 }

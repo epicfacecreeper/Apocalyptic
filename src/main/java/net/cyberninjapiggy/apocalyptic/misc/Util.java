@@ -1,5 +1,8 @@
 package net.cyberninjapiggy.apocalyptic.misc;
 
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
 public class Util {
     public static String title(String str) {
         String[] strs = new String[str.split(" ").length];
@@ -16,5 +19,11 @@ public class Util {
             }
         }
         return titled;
+    }
+    public static ItemStack setName(ItemStack is, String name){
+        ItemMeta m = is.getItemMeta();
+        m.setDisplayName(name);
+        is.setItemMeta(m);
+        return is;
     }
 }

@@ -44,9 +44,9 @@ public class PlayerEat implements Listener {
         	}
         }
         if (isCure) {
-        	a.setPlayerRadiation(e.getPlayer(), 0.0);
+        	a.getRadiationManager().setPlayerRadiation(e.getPlayer(), 0.0);
         }
-        if (a.getPlayerRadiation(e.getPlayer()) >= 6.0 && !e.isCancelled()) {
+        if (a.getRadiationManager().getPlayerRadiation(e.getPlayer()) >= 6.0 && !e.isCancelled()) {
             final int oldLevel = e.getPlayer().getFoodLevel();
             a.getServer().getScheduler().scheduleSyncDelayedTask(a, new Runnable() {
                 @Override

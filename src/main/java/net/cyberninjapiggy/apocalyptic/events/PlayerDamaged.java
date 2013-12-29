@@ -61,10 +61,10 @@ public class PlayerDamaged implements Listener {
         if (e.getEntityType() == EntityType.PLAYER) {
             if (a.worldEnabledFallout(e.getEntity().getWorld().getName())) {
                 
-                if (a.getPlayerRadiation((Player) e.getEntity()) >= 10) {
+                if (a.getRadiationManager().getPlayerRadiation((Player) e.getEntity()) >= 10) {
                     e.setDamage(e.getDamage() * 4);
                 }
-                else if (a.getPlayerRadiation((Player) e.getEntity()) >= 1) {
+                else if (a.getRadiationManager().getPlayerRadiation((Player) e.getEntity()) >= 1) {
                     e.setDamage(e.getDamage() * 2);
                 }
             }

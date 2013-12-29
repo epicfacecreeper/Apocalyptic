@@ -35,7 +35,7 @@ public class PlayerJoin implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
         a.sendApocalypticTexturePack(e.getPlayer());
-        a.loadRadiation(e.getPlayer());
+        a.getRadiationManager().loadRadiation(e.getPlayer());
     }
     public PlayerJoin(Apocalyptic a) {
         this.a = a;

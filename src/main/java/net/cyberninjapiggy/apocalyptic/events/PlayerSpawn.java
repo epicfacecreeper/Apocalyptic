@@ -36,6 +36,6 @@ public class PlayerSpawn implements Listener {
     }
     @EventHandler
     public void onPlayerSpawn(PlayerRespawnEvent e) {
-        a.setPlayerRadiation(e.getPlayer(), 0.0);
+        a.getRadiationManager().setPlayerRadiation(e.getPlayer(), 0.0);
     }
 }

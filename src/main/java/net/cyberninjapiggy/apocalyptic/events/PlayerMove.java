@@ -39,8 +39,8 @@ public class PlayerMove implements Listener {
     public void onPlayerMove(PlayerMoveEvent e) {
         if (a.worldEnabledFallout(e.getPlayer().getWorld().getName())) {
             if (e.getTo().getWorld().getBlockAt(e.getTo()).getType() == Material.WATER || e.getTo().getWorld().getBlockAt(e.getTo()).getType() == Material.STATIONARY_WATER) {
-                if (a.getConfig().getDouble("maxRadiationWashable") >= a.getPlayerRadiation(e.getPlayer()))
-                    a.setPlayerRadiation(e.getPlayer(), 0.0);
+                if (a.getConfig().getDouble("maxRadiationWashable") >= a.getRadiationManager().getPlayerRadiation(e.getPlayer()))
+                    a.getRadiationManager().setPlayerRadiation(e.getPlayer(), 0.0);
                 
             }
         }

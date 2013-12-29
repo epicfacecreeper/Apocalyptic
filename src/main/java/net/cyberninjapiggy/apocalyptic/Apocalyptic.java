@@ -29,10 +29,7 @@ import net.cyberninjapiggy.apocalyptic.commands.ApocalypticCommandExecutor;
 import net.cyberninjapiggy.apocalyptic.commands.RadiationCommandExecutor;
 import net.cyberninjapiggy.apocalyptic.events.*;
 import net.cyberninjapiggy.apocalyptic.generator.RavagedChunkGenerator;
-import net.cyberninjapiggy.apocalyptic.misc.ApocalypticConfiguration;
-import net.cyberninjapiggy.apocalyptic.misc.Messages;
-import net.cyberninjapiggy.apocalyptic.misc.Updater;
-import net.cyberninjapiggy.apocalyptic.misc.Util;
+import net.cyberninjapiggy.apocalyptic.misc.*;
 import org.bukkit.*;
 import org.bukkit.World.Environment;
 import org.bukkit.command.CommandSender;
@@ -77,12 +74,14 @@ public final class Apocalyptic extends JavaPlugin {
     private static final int dboId = 43663;
     private static final String texturePack = "https://www.dropbox.com/s/waiut1qz722uojh/apocalyptic%20texture%20pack.zip?dl=1";
     
-    public static final String METADATA_KEY = "radiation";
-    
-    public static ItemStack hazmatHood;
-    public static ItemStack hazmatSuit;
-    public static ItemStack hazmatPants;
-    public static ItemStack hazmatBoots;
+    private static final String METADATA_KEY = "radiation";
+
+    private ItemStack hazmatHood;
+    private ItemStack hazmatSuit;
+    private ItemStack hazmatPants;
+    private ItemStack hazmatBoots;
+
+    private RadiationManager radiationManager;
 
     private ApocalypticConfiguration cachedConfig;
     private boolean recacheConfig;
@@ -96,10 +95,10 @@ public final class Apocalyptic extends JavaPlugin {
         rand = new Random();
         wg = getWorldGuard();
         
-        hazmatHood = setName(new ItemStack(Material.CHAINMAIL_HELMET, 1), ChatColor.RESET + getMessages().getCaption("gasMask"));
-        hazmatSuit = setName(new ItemStack(Material.CHAINMAIL_CHESTPLATE, 1), ChatColor.RESET + getMessages().getCaption("hazmatSuit"));
-        hazmatPants = setName(new ItemStack(Material.CHAINMAIL_LEGGINGS, 1), ChatColor.RESET + getMessages().getCaption("hazmatPants"));
-        hazmatBoots = setName(new ItemStack(Material.CHAINMAIL_BOOTS, 1), ChatColor.RESET + getMessages().getCaption("hazmatBoots"));
+        hazmatHood = Util.setName(new ItemStack(Material.CHAINMAIL_HELMET, 1), ChatColor.RESET + getMessages().getCaption("gasMask"));
+        hazmatSuit = Util.setName(new ItemStack(Material.CHAINMAIL_CHESTPLATE, 1), ChatColor.RESET + getMessages().getCaption("hazmatSuit"));
+        hazmatPants = Util.setName(new ItemStack(Material.CHAINMAIL_LEGGINGS, 1), ChatColor.RESET + getMessages().getCaption("hazmatPants"));
+        hazmatBoots = Util.setName(new ItemStack(Material.CHAINMAIL_BOOTS, 1), ChatColor.RESET + getMessages().getCaption("hazmatBoots"));
         
         if (wg == null) {
         	wgEnabled = false;
@@ -132,11 +131,10 @@ public final class Apocalyptic extends JavaPlugin {
         } catch (SQLException ex) {
             log.log(Level.SEVERE, null, ex);
         }
-        
-        
-       db.close();
-        
-        
+        db.close();
+
+        radiationManager = new RadiationManager(db, this);
+
         if (getConfig().getBoolean("meta.version-check")) {
         	Updater versionCheck = new Updater(this, dboId, this.getFile(), Updater.UpdateType.NO_DOWNLOAD, false);
         	if (!versionCheck.getLatestName().equals(this.getDescription().getName() + " v" + this.getDescription().getVersion())) {
@@ -164,7 +162,6 @@ public final class Apocalyptic extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerJoin(this), this);
         getServer().getPluginManager().registerEvents(new ZombieTarget(this), this);
         getServer().getPluginManager().registerEvents(new ZombieCombust(this), this);
-        getServer().getPluginManager().registerEvents(new StopHazmatCrafting(this), this);
         
         //Add recipes
         ShapedRecipe hazardHelmetR = new ShapedRecipe(hazmatHood);
@@ -189,7 +186,7 @@ public final class Apocalyptic extends JavaPlugin {
             for (int j=0;j<=3;j++) {
                 int mId = start+(i*4)+j;
                 Material mat = Material.getMaterial(mId);
-                ShapelessRecipe recipe = new ShapelessRecipe(setName(new ItemStack(mat), ChatColor.RESET+messages.getCaption("hazmat")+" "+ Util.title(mat.name().replace("_", " ").toLowerCase())));
+                ShapelessRecipe recipe = new ShapelessRecipe(Util.setName(new ItemStack(mat), ChatColor.RESET + messages.getCaption("hazmat") + " " + Util.title(mat.name().replace("_", " ").toLowerCase())));
                 recipe.addIngredient(mat);
                 Material chain = Material.getMaterial(start-4+j);
                 recipe.addIngredient(chain);
@@ -201,7 +198,7 @@ public final class Apocalyptic extends JavaPlugin {
         for (int j=0;j<=3;j++) {
             int mId = start+j;
             Material mat = Material.getMaterial(mId);
-            ShapelessRecipe recipe = new ShapelessRecipe(setName(new ItemStack(mat), ChatColor.RESET+messages.getCaption("hazmat")+" " + Util.title(mat.name().replace("_", " ").toLowerCase())));
+            ShapelessRecipe recipe = new ShapelessRecipe(Util.setName(new ItemStack(mat), ChatColor.RESET + messages.getCaption("hazmat") + " " + Util.title(mat.name().replace("_", " ").toLowerCase())));
             recipe.addIngredient(mat);
             Material chain = Material.getMaterial(mId+4);
             recipe.addIngredient(chain);
@@ -251,7 +248,7 @@ public final class Apocalyptic extends JavaPlugin {
 	                            p.damage(p.getWorld().getDifficulty().ordinal()*2);
 	                        }
 	                        //Neurological death syndrome
-	                        if (getPlayerRadiation(p) >= 10.0D) {
+	                        if (radiationManager.getPlayerRadiation(p) >= 10.0D) {
 	                            ArrayList<PotionEffect> pfx = new ArrayList<>();
 	                            pfx.add(new PotionEffect(PotionEffectType.BLINDNESS, 10 * 20, 2));
 	                            pfx.add(new PotionEffect(PotionEffectType.CONFUSION, 10 * 20, 2));
@@ -269,7 +266,7 @@ public final class Apocalyptic extends JavaPlugin {
 	                                && aboveLowPoint
 	                                && belowHighPoint
 	                                && random) {
-	                            addPlayerRadiation(p, (p.getWorld().getEnvironment() == Environment.NETHER ? getConfig().getWorld(w).getDouble("radiationRate")*2 : getConfig().getWorld(w).getDouble("radiationRate")) * (Math.round(p.getLevel() / 10)+1));
+	                            radiationManager.addPlayerRadiation(p, (p.getWorld().getEnvironment() == Environment.NETHER ? getConfig().getWorld(w).getDouble("radiationRate")*2 : getConfig().getWorld(w).getDouble("radiationRate")) * (Math.round(p.getLevel() / 10)+1));
 	                        }
 	                    }
                     }
@@ -287,7 +284,7 @@ public final class Apocalyptic extends JavaPlugin {
         try {
             for (World w : Bukkit.getWorlds()) {
             	for (Player p : w.getPlayers()) {
-	                saveRadiation(p);
+	                radiationManager.saveRadiation(p);
             	}
             }
             db.close();
@@ -298,12 +295,6 @@ public final class Apocalyptic extends JavaPlugin {
     @Override
     public ChunkGenerator getDefaultWorldGenerator(String worldName, String genID) {
         return new RavagedChunkGenerator(this, genID);
-    }
-    private static ItemStack setName(ItemStack is, String name){
-        ItemMeta m = is.getItemMeta();
-        m.setDisplayName(name);
-        is.setItemMeta(m);
-        return is;
     }
     /**
      * 
@@ -334,71 +325,7 @@ public final class Apocalyptic extends JavaPlugin {
         boolean boots =  e.getBoots() != null && e.getBoots().getItemMeta().getDisplayName().startsWith(ChatColor.RESET + getMessages().getCaption("hazmat"));
         return helmet && chest && legs && boots;
     }
-    /**
-     * 
-     * @param p the player which to add radiation to
-     * @param level the amount of radiation (in grays) to add to the player
-     */
-    public void addPlayerRadiation(Player p, double level) {
-    	
-    	//p.setMetadata(METADATA_KEY, new FixedMetadataValue(p.getMetadata(METADATA_KEY).g));
-        double oldRadiation = 0;
-    	if (p.getMetadata(METADATA_KEY).size() > 0) {
-            oldRadiation = p.getMetadata(METADATA_KEY).get(0).asDouble();
-    		p.setMetadata(METADATA_KEY, new FixedMetadataValue(this, oldRadiation+level));
-    	}
-    	else {
-    		p.setMetadata(METADATA_KEY, new FixedMetadataValue(this, level));
-    	}
-        
-        if (getPlayerRadiation(p) >= 0.8 && getPlayerRadiation(p) < 1.0) {
-            p.sendMessage(new String[] {
-                ChatColor.RED + getMessages().getCaption("warning") +" "+ ChatColor.GOLD + getMessages().getCaption("radiationCriticalWarning") ,
-                ChatColor.RED + getMessages().getCaption("warning") +" "+ ChatColor.GOLD + getMessages().getCaption("radBloodWarning") });
-        }
-        if (oldRadiation < 1.0 && getPlayerRadiation(p) >= 1.0 && getPlayerRadiation(p) < 6.0) {
-            p.sendMessage(new String[] {
-                ChatColor.RED + getMessages().getCaption("warning") +" "+ ChatColor.GOLD + getMessages().getCaption("radDangerLevel") ,
-                ChatColor.RED + getMessages().getCaption("warning") +" "+ ChatColor.GOLD + getMessages().getCaption("radBlood") ,
-                ChatColor.RED + getMessages().getCaption("warning") +" "+ ChatColor.GOLD + getMessages().getCaption("takemoredamage")
-            });
-        }
-        if (oldRadiation < 6.0 && getPlayerRadiation(p) >= 6.0 && getPlayerRadiation(p) < 10.0) {
-            p.sendMessage(new String[] {
-                ChatColor.RED + getMessages().getCaption("warning") +" "+ ChatColor.GOLD + getMessages().getCaption("radiationCritical") ,
-                ChatColor.RED + getMessages().getCaption("warning") +" "+ ChatColor.GOLD + getMessages().getCaption("radBloodStomach") ,
-            ChatColor.RED + getMessages().getCaption("warning") +" "+ ChatColor.GOLD + getMessages().getCaption("takeMoreDamageandNoEat")
-            });
-        }
-        if (oldRadiation < 10.0 && getPlayerRadiation(p) >= 10) {
-            p.sendMessage(new String[] {
-                ChatColor.RED + getMessages().getCaption("warning") +" "+ ChatColor.GOLD + getMessages().getCaption("radDeadly") ,
-                ChatColor.RED + getMessages().getCaption("warning") +" "+ ChatColor.GOLD + getMessages().getCaption("radAll") ,
-            ChatColor.RED + getMessages().getCaption("warning") +" "+ ChatColor.GOLD + getMessages().getCaption("radAllExplain")
-            });
-        }
-        
-    }
-    /**
-     * 
-     * @param p the player
-     * @return the radiation level (in grays) of the specified player
-     */
-    public double getPlayerRadiation(Player p) {
-    	if (p.getMetadata(METADATA_KEY).size() > 0) 
-    		return p.getMetadata(METADATA_KEY).get(0).asDouble();
-    	else
-    		return 0;
-    }
-    /**
-     * 
-     * @param p the player which to set the radiation level of
-     * @param radiation the level of radiation (in grays) that the player is set to
-     */
-    public void setPlayerRadiation(Player p, double radiation) {
-        addPlayerRadiation(p, getPlayerRadiation(p) * -1);
-        addPlayerRadiation(p, radiation);
-    }
+
     
     /**
      * Sends apocalyptic texture pack to a player.
@@ -460,38 +387,64 @@ public final class Apocalyptic extends JavaPlugin {
      
         return plugin;
     }
-    public void saveRadiation(Player p) throws SQLException {
-    	db.open();
-        if (!p.getMetadata(METADATA_KEY).isEmpty()) {
-            if (db.query("SELECT COUNT(*) AS \"exists\" FROM radiationLevels WHERE player=\"" + p.getName() + "\";").getInt("exists") > 0) { //$NON-NLS-3$
-                db.query("UPDATE radiationLevels SET level="+p.getMetadata(METADATA_KEY).get(0).asDouble()+" WHERE player=\"" + p.getName()+"\";");
-            }
-            else {
-                db.query("INSERT INTO radiationLevels (player, level) VALUES (\"" + p.getName() + "\", " + p.getMetadata(METADATA_KEY).get(0).asDouble() + ");"); //$NON-NLS-3$
-            }
-        }
-    	db.close();
-    }
-    public void loadRadiation(Player p) {
 
-        db.open();
-        ResultSet result;
-        try {
-            result = db.query("SELECT * FROM radiationLevels WHERE player=\""+p.getName()+"\"");
-            while (result.next()) {
-                p.setMetadata(Apocalyptic.METADATA_KEY, new FixedMetadataValue(this, result.getDouble("level")));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        db.close();
-    }
-
+    /**
+     * Get the language file.
+     * @return The language file.
+     */
 	public Messages getMessages() {
 		return messages;
 	}
+
+    /**
+     * Recache the configuration file.
+     */
     public void reloadConfig() {
         recacheConfig = true;
     }
 
+    /**
+     * Get the metadata key used to save radiation to players.
+     * @return The metadata key.
+     */
+    public String getMetadataKey() {
+        return METADATA_KEY;
+    }
+
+    /**
+     * Get the radiation manager, used for saving, adding, and setting radiation.
+     * @return The Radiation Manager object.
+     */
+    public RadiationManager getRadiationManager() {
+        return radiationManager;
+    }
+
+    /**
+     * Get the Gas Mask itemstack
+     * @return an itemstack with 1 Gas Mask.
+     */
+    public ItemStack getHazmatHood() {
+        return hazmatHood;
+    }
+    /**
+     * Get the Hazmat Suit itemstack
+     * @return an itemstack with 1 Hazmat Suit.
+     */
+    public ItemStack getHazmatSuit() {
+        return hazmatSuit;
+    }
+    /**
+     * Get the Hazmat Leggings itemstack
+     * @return an itemstack with 1 Hazmat Leggings.
+     */
+    public ItemStack getHazmatPants() {
+        return hazmatPants;
+    }
+    /**
+     * Get the Hazmat Boots itemstack
+     * @return an itemstack with 1 Hazmat Boots.
+     */
+    public ItemStack getHazmatBoots() {
+        return hazmatBoots;
+    }
 }

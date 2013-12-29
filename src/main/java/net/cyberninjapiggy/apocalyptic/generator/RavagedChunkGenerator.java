@@ -20,6 +20,7 @@
 
 package net.cyberninjapiggy.apocalyptic.generator;
 
+import net.cyberninjapiggy.apocalyptic.Apocalyptic;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
@@ -40,9 +41,9 @@ import java.util.Random;
 public class RavagedChunkGenerator extends ChunkGenerator {
 
     private String genID;
-	private Plugin apocalyptic;
+	private Apocalyptic apocalyptic;
 
-	public RavagedChunkGenerator(Plugin p, String genID) {
+	public RavagedChunkGenerator(Apocalyptic p, String genID) {
 		this.genID = genID;
 		this.apocalyptic = p;
 	}
@@ -80,6 +81,12 @@ public class RavagedChunkGenerator extends ChunkGenerator {
                 		|| world.getBiome(realX, realZ) == Biome.BIRCH_FOREST_MOUNTAINS || world.getBiome(realX, realZ) == Biome.TAIGA_MOUNTAINS) {
                     multitude = 32; 
                     amplitude = 0.1;
+                }
+                else if (world.getBiome(realX, realZ) == Biome.EXTREME_HILLS_PLUS || world.getBiome(realX, realZ) == Biome.EXTREME_HILLS_PLUS_MOUNTAINS) {
+                    amplitude = 0.01;
+                    multitude = 64;
+                    if (sea_level > 96)
+                        sea_level = 96;
                 }
                 else if (world.getBiome(realX, realZ) == Biome.SWAMPLAND) {
                     multitude = 32; 
@@ -147,6 +154,9 @@ public class RavagedChunkGenerator extends ChunkGenerator {
                         	else if (false && world.getBiome(realX, realZ) == Biome.FLOWER_FOREST) {
                         		// TODO podzol
                         	}
+                            else if (world.getBiome(realX, realZ) == Biome.JUNGLE) {
+                                setBlock(x,y,z,chunk,Material.SAND);
+                            }
                         	else {
 	                        	if (y < maxHeight) {
 	                        		setBlock(x,y,z,chunk,Material.DIRT);
@@ -177,7 +187,7 @@ public class RavagedChunkGenerator extends ChunkGenerator {
         pops.add(new OasisPopulator());
         pops.add(new TreePopulator());
         pops.add(new OrePopulator(world));
-        pops.add(new AbandonedHousePopulator());
+        pops.add(new AbandonedHousePopulator(apocalyptic));
         pops.add(new CavePopulator());
         pops.add(new LavaPopulator());
         
