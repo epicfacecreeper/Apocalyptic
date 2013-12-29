@@ -26,7 +26,6 @@ import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.generator.BlockPopulator;
 import org.bukkit.generator.ChunkGenerator;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.util.noise.OctaveGenerator;
 import org.bukkit.util.noise.PerlinOctaveGenerator;
 
@@ -40,8 +39,8 @@ import java.util.Random;
  */
 public class RavagedChunkGenerator extends ChunkGenerator {
 
-    private String genID;
-	private Apocalyptic apocalyptic;
+    private final String genID;
+	private final Apocalyptic apocalyptic;
 
 	public RavagedChunkGenerator(Apocalyptic p, String genID) {
 		this.genID = genID;
@@ -53,6 +52,7 @@ public class RavagedChunkGenerator extends ChunkGenerator {
         if (!(y <= 256 && y >= 0 && x <= 16 && x >= 0 && z <= 16 && z >= 0))
             return;
         try {
+            //noinspection deprecation
             chunk[y >> 4][((y & 0xF) << 8) | (z << 4) | x] = (byte) material.getId();
         } catch (Exception e) {e.printStackTrace();}
 }

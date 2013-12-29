@@ -46,13 +46,13 @@ public class CavePopulator extends BlockPopulator {
 
 	      int y = random.nextInt(maxY);
 	      Set<Location> snake = selectBlocksForCave(world, random, x, y, z);
-	      buildCave(world, (Location[])snake.toArray(new Location[0]));
+	      buildCave(world, snake.toArray(new Location[0]));
 	      for (Location block : snake)
 	        world.unloadChunk(((int)block.getX() / 16), ((int)block.getZ() / 16));
 	    }
 	  }
 
-	  static Set<Location> selectBlocksForCave(World world, Random random, int blockX, int blockY, int blockZ)
+	  private static Set<Location> selectBlocksForCave(World world, Random random, int blockX, int blockY, int blockZ)
 	  {
 	    Set<Location> snakeBlocks = new HashSet<>();
 
@@ -64,31 +64,40 @@ public class CavePopulator extends BlockPopulator {
 	      if (random.nextInt(20) == 0) {
 	        blockY++;
 	      }
-	      else if (world.getBlockTypeIdAt(blockX, blockY + 2, blockZ) == 0) {
+	      else //noinspection deprecation
+              if (world.getBlockTypeIdAt(blockX, blockY + 2, blockZ) == 0) {
 	        blockY += 2;
 	      }
-	      else if (world.getBlockTypeIdAt(blockX + 2, blockY, blockZ) == 0) {
+	      else //noinspection deprecation
+              if (world.getBlockTypeIdAt(blockX + 2, blockY, blockZ) == 0) {
 	        blockX++;
 	      }
-	      else if (world.getBlockTypeIdAt(blockX - 2, blockY, blockZ) == 0) {
+	      else //noinspection deprecation
+                  if (world.getBlockTypeIdAt(blockX - 2, blockY, blockZ) == 0) {
 	        blockX--;
 	      }
-	      else if (world.getBlockTypeIdAt(blockX, blockY, blockZ + 2) == 0) {
+	      else //noinspection deprecation
+              if (world.getBlockTypeIdAt(blockX, blockY, blockZ + 2) == 0) {
 	        blockZ++;
 	      }
-	      else if (world.getBlockTypeIdAt(blockX, blockY, blockZ - 2) == 0) {
+	      else //noinspection deprecation
+                  if (world.getBlockTypeIdAt(blockX, blockY, blockZ - 2) == 0) {
 	        blockZ--;
 	      }
-	      else if (world.getBlockTypeIdAt(blockX + 1, blockY, blockZ) == 0) {
+	      else //noinspection deprecation
+                      if (world.getBlockTypeIdAt(blockX + 1, blockY, blockZ) == 0) {
 	        blockX++;
 	      }
-	      else if (world.getBlockTypeIdAt(blockX - 1, blockY, blockZ) == 0) {
+	      else //noinspection deprecation
+                      if (world.getBlockTypeIdAt(blockX - 1, blockY, blockZ) == 0) {
 	        blockX--;
 	      }
-	      else if (world.getBlockTypeIdAt(blockX, blockY, blockZ + 1) == 0) {
+	      else //noinspection deprecation
+              if (world.getBlockTypeIdAt(blockX, blockY, blockZ + 1) == 0) {
 	        blockZ++;
 	      }
-	      else if (world.getBlockTypeIdAt(blockX, blockY, blockZ - 1) == 0) {
+	      else //noinspection deprecation
+                  if (world.getBlockTypeIdAt(blockX, blockY, blockZ - 1) == 0) {
 	        blockZ--;
 	      }
 	      else if (random.nextBoolean()) {
@@ -104,14 +113,16 @@ public class CavePopulator extends BlockPopulator {
 	        blockZ--;
 	      }
 
-	      if (world.getBlockTypeIdAt(blockX, blockY, blockZ) != 0) {
+            //noinspection deprecation
+            if (world.getBlockTypeIdAt(blockX, blockY, blockZ) != 0) {
 	        int radius = 1 + random.nextInt(2);
 	        int radius2 = radius * radius + 1;
 	        for (int x = -radius; x <= radius; x++) {
 	          for (int y = -radius; y <= radius; y++) {
 	            for (int z = -radius; z <= radius; z++) {
 	              if ((x * x + y * y + z * z <= radius2) && (y >= 0) && (y < 128))
-	                if (world.getBlockTypeIdAt(blockX + x, blockY + y, blockZ + z) == 0) {
+                      //noinspection deprecation
+                      if (world.getBlockTypeIdAt(blockX + x, blockY + y, blockZ + z) == 0) {
 	                  airHits++;
 	                } else {
 	                  block.setX(blockX + x);
@@ -133,7 +144,7 @@ public class CavePopulator extends BlockPopulator {
 	    return snakeBlocks;
 	  }
 
-	  static void buildCave(World world, Location[] snakeBlocks) {
+	  private static void buildCave(World world, Location[] snakeBlocks) {
 	    for (Location loc : snakeBlocks) {
 	      Block block = world.getBlockAt(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
 	      if ((!block.isEmpty()) && (!block.isLiquid()) && (block.getType() != Material.BEDROCK))

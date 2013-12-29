@@ -39,8 +39,8 @@ import java.util.Random;
  * @author Nick
  */
 public class AbandonedHousePopulator extends BlockPopulator {
-    private Apocalyptic plugin;
-    private Map<ItemStack, Integer> lootTable = new HashMap<>();
+    private final Apocalyptic plugin;
+    private final Map<ItemStack, Integer> lootTable = new HashMap<>();
 
     public AbandonedHousePopulator(Apocalyptic plugin) {
         this.plugin = plugin;
@@ -68,7 +68,7 @@ public class AbandonedHousePopulator extends BlockPopulator {
             }
         }
     }
-    public void buildHouse(World world, Random rand, int realX, int realZ, int door) {
+    private void buildHouse(World world, Random rand, int realX, int realZ, int door) {
         int houseX = rand.nextInt(4) + 4;
         int houseZ = rand.nextInt(4) + 4;
         
@@ -124,6 +124,7 @@ public class AbandonedHousePopulator extends BlockPopulator {
                         else if (rand.nextBoolean())
                             world.getBlockAt(realX+i, realY+p, realZ+o).setType(Material.WOOD);
                         else
+                            //noinspection deprecation,deprecation
                             world.getBlockAt(realX+i, realY+p, realZ+o).setTypeIdAndData(Material.WOOD.getId(), (byte) 3, false);
                     }
                     else if (p == 1 && isWall && !isDoorSpot) {
@@ -136,6 +137,7 @@ public class AbandonedHousePopulator extends BlockPopulator {
                         else if (rand.nextBoolean())
                             world.getBlockAt(realX+i, realY+p, realZ+o).setType(Material.WOOD);
                         else
+                            //noinspection deprecation,deprecation
                             world.getBlockAt(realX+i, realY+p, realZ+o).setTypeIdAndData(Material.WOOD.getId(), (byte) 3, false);
                     }
                     else if (p == 3 && isWall) {
@@ -151,26 +153,32 @@ public class AbandonedHousePopulator extends BlockPopulator {
                         else if (rand.nextBoolean())
                             world.getBlockAt(realX+i, realY+p, realZ+o).setType(Material.WOOD);
                         else
+                            //noinspection deprecation,deprecation
                             world.getBlockAt(realX+i, realY+p, realZ+o).setTypeIdAndData(Material.WOOD.getId(), (byte) 3, false);
                     }
                     
                     else if (p == 4) {
                         if (i == 0) {
+                            //noinspection deprecation,deprecation
                             world.getBlockAt(realX+i, realY+p, realZ+o).setTypeIdAndData(Material.COBBLESTONE_STAIRS.getId(), (byte) 0, false);
                         }
                         else if (i == houseX) {
+                            //noinspection deprecation,deprecation
                             world.getBlockAt(realX+i, realY+p, realZ+o).setTypeIdAndData(Material.COBBLESTONE_STAIRS.getId(), (byte) 1, false);
                         }
                         else if (o == 0) {
+                            //noinspection deprecation,deprecation
                             world.getBlockAt(realX+i, realY+p, realZ+o).setTypeIdAndData(Material.COBBLESTONE_STAIRS.getId(), (byte) 2, false);
                         }
                         else if (o == houseZ) {
+                            //noinspection deprecation,deprecation
                             world.getBlockAt(realX+i, realY+p, realZ+o).setTypeIdAndData(Material.COBBLESTONE_STAIRS.getId(), (byte) 3, false);
                         }
                         else {
                             if (rand.nextBoolean())
                                 world.getBlockAt(realX+i, realY+p, realZ+o).setType(Material.WOOD);
                             else
+                                //noinspection deprecation,deprecation
                                 world.getBlockAt(realX+i, realY+p, realZ+o).setTypeIdAndData(Material.WOOD.getId(), (byte) 3, false);
                         }
                     }
@@ -199,7 +207,7 @@ public class AbandonedHousePopulator extends BlockPopulator {
             }
         }
     }
-    public void genLootTable(Random rand) {
+    private void genLootTable(Random rand) {
     	lootTable.put(plugin.getHazmatBoots(), 2);
         lootTable.put(plugin.getHazmatPants(), 2);
         lootTable.put(plugin.getHazmatSuit(), 2);

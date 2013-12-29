@@ -10,8 +10,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class RadiationManager {
-    private Database db;
-    private Apocalyptic apocalyptic;
+    private final Database db;
+    private final Apocalyptic apocalyptic;
     public RadiationManager(Database db, Apocalyptic apocalyptic) {
         this.db = db;
         this.apocalyptic = apocalyptic;
@@ -94,10 +94,10 @@ public class RadiationManager {
      * @return the radiation level (in grays) of the specified player
      */
     public double getPlayerRadiation(Player p) {
-        if (p.getMetadata(apocalyptic.getMetadataKey()).size() > 0)
+        if (p.getMetadata(apocalyptic.getMetadataKey()).size() > 0) {
             return p.getMetadata(apocalyptic.getMetadataKey()).get(0).asDouble();
-        else
-            return 0;
+        }
+        return 0;
     }
     /**
      *

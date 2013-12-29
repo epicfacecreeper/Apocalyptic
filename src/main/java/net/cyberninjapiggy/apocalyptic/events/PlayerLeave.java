@@ -29,7 +29,7 @@ import java.sql.SQLException;
 
 public class PlayerLeave implements Listener {
 
-	private Apocalyptic apocalyptic;
+	private final Apocalyptic apocalyptic;
 
 	public PlayerLeave(Apocalyptic a) {
 		this.apocalyptic = a;

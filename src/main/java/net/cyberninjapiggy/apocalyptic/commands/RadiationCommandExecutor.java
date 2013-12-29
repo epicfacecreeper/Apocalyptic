@@ -71,10 +71,10 @@ public class RadiationCommandExecutor implements CommandExecutor {
                 }
             }
             else {
-                if (args.length == 0 && a.canDoCommand((Player) sender, "radiation.self")) {
+                if (args.length == 0 && a.canDoCommand(sender, "radiation.self")) {
                     sendRadiationMessage(sender, a.getRadiationManager().getPlayerRadiation((Player) sender));
                 }
-                if (args.length == 1 && a.canDoCommand((Player) sender, "radiation.other")) {
+                if (args.length == 1 && a.canDoCommand(sender, "radiation.other")) {
                     if (a.getServer().getPlayer(args[0]).isOnline()) {
 
                         sendRadiationMessage(sender, a.getRadiationManager().getPlayerRadiation(a.getServer().getPlayer(args[0])));
@@ -83,7 +83,7 @@ public class RadiationCommandExecutor implements CommandExecutor {
                         sender.sendMessage("Cannot find player \"" + args[0] + "\"");
                     }
                 }
-                if (args.length == 2 && a.canDoCommand((Player) sender, "radiation.change")) {
+                if (args.length == 2 && a.canDoCommand(sender, "radiation.change")) {
                     if (a.getServer().getPlayer(args[0]).isOnline()) {
                         if (isNumeric(args[1])) {
                             sender.sendMessage("Set radiation");

@@ -33,17 +33,13 @@ import net.cyberninjapiggy.apocalyptic.misc.*;
 import org.bukkit.*;
 import org.bukkit.World.Environment;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
@@ -51,10 +47,8 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -64,9 +58,9 @@ import java.util.logging.Logger;
  * @author Nick
  */
 public final class Apocalyptic extends JavaPlugin {
-    private static Logger log;
+    private Logger log;
     private Database db;
-    public Random rand;
+    private Random rand;
     private Plugin wg;
     private boolean wgEnabled = true;
     private Messages messages;
@@ -105,7 +99,9 @@ public final class Apocalyptic extends JavaPlugin {
         }
         
         if (!getDataFolder().exists()) {
-            getDataFolder().mkdir();
+            if (!getDataFolder().mkdir()) {
+                log.severe("Cannot create data folder. Expect terrible errors.");
+            }
         }
         messages.saveDefault();
         if (!new File(getDataFolder().getPath() + File.separator + "config.yml").exists()) {
@@ -185,10 +181,10 @@ public final class Apocalyptic extends JavaPlugin {
             //Loop through pieces of the armor in the set
             for (int j=0;j<=3;j++) {
                 int mId = start+(i*4)+j;
-                Material mat = Material.getMaterial(mId);
+                @SuppressWarnings("deprecation") Material mat = Material.getMaterial(mId);
                 ShapelessRecipe recipe = new ShapelessRecipe(Util.setName(new ItemStack(mat), ChatColor.RESET + messages.getCaption("hazmat") + " " + Util.title(mat.name().replace("_", " ").toLowerCase())));
                 recipe.addIngredient(mat);
-                Material chain = Material.getMaterial(start-4+j);
+                @SuppressWarnings("deprecation") Material chain = Material.getMaterial(start-4+j);
                 recipe.addIngredient(chain);
 
                 getServer().addRecipe(recipe);
@@ -197,10 +193,10 @@ public final class Apocalyptic extends JavaPlugin {
         start = 298;
         for (int j=0;j<=3;j++) {
             int mId = start+j;
-            Material mat = Material.getMaterial(mId);
+            @SuppressWarnings("deprecation") Material mat = Material.getMaterial(mId);
             ShapelessRecipe recipe = new ShapelessRecipe(Util.setName(new ItemStack(mat), ChatColor.RESET + messages.getCaption("hazmat") + " " + Util.title(mat.name().replace("_", " ").toLowerCase())));
             recipe.addIngredient(mat);
-            Material chain = Material.getMaterial(mId+4);
+            @SuppressWarnings("deprecation") Material chain = Material.getMaterial(mId+4);
             recipe.addIngredient(chain);
             //log.info(chain.name() + " " + mat.name());
 
@@ -266,7 +262,7 @@ public final class Apocalyptic extends JavaPlugin {
 	                                && aboveLowPoint
 	                                && belowHighPoint
 	                                && random) {
-	                            radiationManager.addPlayerRadiation(p, (p.getWorld().getEnvironment() == Environment.NETHER ? getConfig().getWorld(w).getDouble("radiationRate")*2 : getConfig().getWorld(w).getDouble("radiationRate")) * (Math.round(p.getLevel() / 10)+1));
+	                            radiationManager.addPlayerRadiation(p, (p.getWorld().getEnvironment() == Environment.NETHER ? getConfig().getWorld(w).getDouble("radiationRate") * 2 : getConfig().getWorld(w).getDouble("radiationRate")) * (Math.round(p.getLevel() / 10) + 1));
 	                        }
 	                    }
                     }
@@ -446,5 +442,8 @@ public final class Apocalyptic extends JavaPlugin {
      */
     public ItemStack getHazmatBoots() {
         return hazmatBoots;
+    }
+    public Random getRandom() {
+        return rand;
     }
 }

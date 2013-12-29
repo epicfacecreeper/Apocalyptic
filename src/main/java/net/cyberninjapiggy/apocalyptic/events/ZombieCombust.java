@@ -28,7 +28,7 @@ import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityCombustEvent;
 
 public class ZombieCombust implements Listener {
-	private Apocalyptic plugin;
+	private final Apocalyptic plugin;
 	@EventHandler
 	public void onZombieBurn(EntityCombustEvent e) {
 		if (plugin.worldEnabledZombie(e.getEntity().getWorld().getName()) 

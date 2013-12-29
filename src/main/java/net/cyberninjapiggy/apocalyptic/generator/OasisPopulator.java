@@ -92,6 +92,7 @@ public class OasisPopulator extends BlockPopulator {
                                 tree = new Location(world, realX+x, world.getHighestBlockYAt(realX+x, realZ+y), realZ+y);
                             }
                             if (rand.nextInt(2) == 0) {
+                                //noinspection deprecation,deprecation
                                 world.getBlockAt(realX+x, world.getHighestBlockYAt(realX+x, realZ+y), realZ+y).setTypeIdAndData(Material.LONG_GRASS.getId(), (byte) 1, true);
                             }
                         }
@@ -138,7 +139,7 @@ public class OasisPopulator extends BlockPopulator {
             world.generateTree(tree, tt);
         }
     }
-    public void genDirtCircle(World world, Random rand, Chunk chunk, int size, int level, int realX, int realZ) {
+    private void genDirtCircle(World world, Random rand, Chunk chunk, int size, int level, int realX, int realZ) {
     	int mysize = size - 1;
         int[][] matrix = new int[mysize][mysize];
         double midPoint = (matrix.length-1)/2.0;

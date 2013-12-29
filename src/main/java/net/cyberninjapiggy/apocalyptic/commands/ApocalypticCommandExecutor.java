@@ -32,7 +32,7 @@ import org.bukkit.command.CommandSender;
  */
 public class ApocalypticCommandExecutor implements CommandExecutor {
     private final Apocalyptic a;
-    private String[] radiationHelp;
+    private final String[] radiationHelp;
 
     public ApocalypticCommandExecutor(Apocalyptic aThis) {
         this.a = aThis;

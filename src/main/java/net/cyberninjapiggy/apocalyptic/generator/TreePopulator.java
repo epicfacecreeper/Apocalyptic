@@ -49,7 +49,7 @@ public class TreePopulator extends BlockPopulator {
             }
         }
     }
-    public void genTree(int x, int y, int z, World world, Random rand) {
+    private void genTree(int x, int y, int z, World world, Random rand) {
         int limbs = rand.nextInt(5)+ 2;
         int height = rand.nextInt(6) + 7;
         for (int i=0;i<height;i++) {
@@ -86,15 +86,19 @@ public class TreePopulator extends BlockPopulator {
             for (int o=0;o<len;o++) {
                 switch(dir) {
                     case 0:
+                        //noinspection deprecation,deprecation
                         world.getBlockAt(x2, y2+spot, z2+o).setTypeIdAndData(Material.LOG.getId(), (byte) metadata, true);
                         break;
                     case 2:
+                        //noinspection deprecation,deprecation
                         world.getBlockAt(x2, y2+spot, z2-o).setTypeIdAndData(Material.LOG.getId(), (byte) metadata, true);
                         break;
                     case 1:
+                        //noinspection deprecation,deprecation
                         world.getBlockAt(x2-o, y2+spot, z2).setTypeIdAndData(Material.LOG.getId(), (byte) metadata, true);
                         break;
                     case 3:
+                        //noinspection deprecation,deprecation
                         world.getBlockAt(x2+o, y2+spot, z2).setTypeIdAndData(Material.LOG.getId(), (byte) metadata, true);
                         break;
                 }

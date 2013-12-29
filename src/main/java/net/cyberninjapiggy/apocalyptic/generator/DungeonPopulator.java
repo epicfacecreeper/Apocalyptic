@@ -127,6 +127,7 @@ public class DungeonPopulator extends BlockPopulator {
                 c.getInventory().setItem(rand.nextInt(c.getInventory().getSize()), new ItemStack(Material.REDSTONE, rand.nextInt(4)+1));
             }
             else if (rand.nextInt(110)==0) {
+                //noinspection deprecation
                 c.getInventory().setItem(rand.nextInt(c.getInventory().getSize()), new ItemStack(2256+rand.nextInt(2)));
             }
             /*else if (rand.nextInt(11)==0) {

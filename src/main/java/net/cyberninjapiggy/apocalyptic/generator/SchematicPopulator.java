@@ -34,7 +34,7 @@ import java.util.Random;
 public class SchematicPopulator extends BlockPopulator {
 
 	private Schematic schematic;
-	private int chance;
+	private final int chance;
 
 	public SchematicPopulator(Plugin p, String schemName, int chance) {
 		try {
