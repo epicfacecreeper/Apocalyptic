@@ -25,14 +25,21 @@ import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Chest;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.generator.BlockPopulator;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
+import java.util.Set;
 
 /**
  *
@@ -40,17 +47,20 @@ import java.util.Random;
  */
 public class AbandonedHousePopulator extends BlockPopulator {
     private final Apocalyptic plugin;
-    private final Map<ItemStack, Integer> lootTable = new HashMap<>();
+    private final Map<LootTableEntry, Integer> lootTable = new HashMap<>();
+    private int chance;
 
-    public AbandonedHousePopulator(Apocalyptic plugin) {
+    public AbandonedHousePopulator(Apocalyptic plugin, FileConfiguration config) {
         this.plugin = plugin;
+        chance = config.getInt("houses.frequency");
+        genLootTable(config);
     }
 
     @Override
     public void populate(World world, Random rand, Chunk chunk) {
-    	genLootTable(rand);
+    	//genLootTable();
         if (world.canGenerateStructures()) {
-            if (rand.nextInt(400) == 0) {
+            if (rand.nextInt(chance) == 0) {
                 int realX;
                 int realZ;
                 outer_loop:
@@ -189,9 +199,27 @@ public class AbandonedHousePopulator extends BlockPopulator {
                             Chest c = (Chest) world.getBlockAt(realX+i, realY+p, realZ+o).getState();
                             Inventory inv = c.getBlockInventory();
 
-                            for (Entry<ItemStack, Integer> e : lootTable.entrySet()) {
+                            for (Entry<LootTableEntry, Integer> e : lootTable.entrySet()) {
                                 if (rand.nextInt(e.getValue()) == 0) {
-                                    inv.setItem(rand.nextInt(inv.getSize()-1), e.getKey());
+                                    ItemStack stack = null;
+                                    if (e.getKey().isSpecialItem()) {
+                                        switch (e.getKey().getSpecialItem()) {
+                                            case HAZMAT_HOOD:
+                                                stack = new ItemStack(plugin.getHazmatHood()); break;
+                                            case HAZMAT_SUIT:
+                                                stack = new ItemStack(plugin.getHazmatSuit()); break;
+                                            case HAZMAT_PANTS:
+                                                stack = new ItemStack(plugin.getHazmatPants()); break;
+                                            case HAZMAT_BOOTS:
+                                                stack = new ItemStack(plugin.getHazmatBoots()); break;
+                                        }
+                                    }
+                                    else {
+                                        stack = new ItemStack(e.getKey().getMaterial());
+                                    }
+                                    plugin.getLogger().info(""+(e.getKey().getMax()-e.getKey().getMin()));
+                                    stack.setAmount(rand.nextInt(e.getKey().getMax()-e.getKey().getMin()+1)+e.getKey().getMin());
+                                    inv.setItem(rand.nextInt(inv.getSize()-1), stack);
                                 }
                             }
                             chest = true;
@@ -207,8 +235,8 @@ public class AbandonedHousePopulator extends BlockPopulator {
             }
         }
     }
-    private void genLootTable(Random rand) {
-    	lootTable.put(plugin.getHazmatBoots(), 2);
+    private void genLootTable(FileConfiguration worldConfig) {
+    	/*lootTable.put(plugin.getHazmatBoots(), 2);
         lootTable.put(plugin.getHazmatPants(), 2);
         lootTable.put(plugin.getHazmatSuit(), 2);
         lootTable.put(plugin.getHazmatHood(), 2);
@@ -216,6 +244,79 @@ public class AbandonedHousePopulator extends BlockPopulator {
         lootTable.put(new ItemStack(Material.SADDLE, 1), 1);
         lootTable.put(new ItemStack(Material.OBSIDIAN, rand.nextInt(4) + 1), 4);
         lootTable.put(new ItemStack(Material.LAVA_BUCKET), 5);
-        lootTable.put(new ItemStack(Material.SUGAR_CANE), 4);
+        lootTable.put(new ItemStack(Material.SUGAR_CANE), 4);*/
+
+        ConfigurationSection loot = worldConfig.getConfigurationSection("houses.loot");
+        Set<String> keys = loot.getKeys(false);
+        for (String key : keys) {
+            LootTableEntry entry;
+            ConfigurationSection item = worldConfig.getConfigurationSection("houses.loot."+key);
+            SpecialItem special = SpecialItem.match(item.getName());
+            if (special != null) {
+                entry = new LootTableEntry(special, item.getInt("min"), item.getInt("max"));
+            }
+            else {
+                entry = new LootTableEntry(Material.matchMaterial(item.getName()), item.getInt("min"), item.getInt("max"));
+            }
+            lootTable.put(entry, item.getInt("frequency"));
+        }
+    }
+    private class LootTableEntry {
+        private final Material mat;
+        private final int min;
+        private final int max;
+        private final SpecialItem item;
+        private boolean isSpecialItem = false;
+
+        public LootTableEntry(Material mat, int min, int max) {
+
+            this.mat = mat;
+            this.min = min;
+            this.max = max;
+            item = null;
+        }
+        public LootTableEntry(SpecialItem item, int min, int max) {
+            isSpecialItem = true;
+            this.item = item;
+            this.min = min;
+            this.max = max;
+            mat = null;
+        }
+
+        public Material getMaterial() {
+            return mat;
+        }
+
+        public int getMin() {
+            return min;
+        }
+
+        public int getMax() {
+            return max;
+        }
+
+        public boolean isSpecialItem() {
+            return isSpecialItem;
+        }
+
+        public SpecialItem getSpecialItem() {
+            return item;
+        }
+    }
+    private enum SpecialItem {
+        HAZMAT_HOOD,
+        HAZMAT_SUIT,
+        HAZMAT_PANTS,
+        HAZMAT_BOOTS;
+        public static SpecialItem match(String s) {
+            SpecialItem item;
+            try {
+                item = SpecialItem.valueOf(s.toUpperCase());
+            }
+            catch (IllegalArgumentException e) {
+                return null;
+            }
+            return item;
+        }
     }
 }

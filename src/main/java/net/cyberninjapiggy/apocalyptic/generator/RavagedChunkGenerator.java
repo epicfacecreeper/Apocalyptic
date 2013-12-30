@@ -24,11 +24,14 @@ import net.cyberninjapiggy.apocalyptic.Apocalyptic;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.generator.BlockPopulator;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.util.noise.OctaveGenerator;
 import org.bukkit.util.noise.PerlinOctaveGenerator;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -45,6 +48,9 @@ public class RavagedChunkGenerator extends ChunkGenerator {
 	public RavagedChunkGenerator(Apocalyptic p, String genID) {
 		this.genID = genID;
 		this.apocalyptic = p;
+
+
+
 	}
 	public static void setBlock(int x, int y, int z, byte[][] chunk, Material material) {
         if (chunk[y >> 4] == null)
@@ -181,13 +187,43 @@ public class RavagedChunkGenerator extends ChunkGenerator {
     
     @Override
     public List<BlockPopulator> getDefaultPopulators(World world) {
+        File worldsFolder = new File(apocalyptic.getDataFolder()+File.separator+"worlds");
+        FileConfiguration config;
+        if (!worldsFolder.exists()) {
+            worldsFolder.mkdir();
+        }
+        File worldConfig = new File(worldsFolder.getAbsolutePath() + File.separator + world.getName() + ".yml");
+
+        if (!worldConfig.exists())
+        {
+            InputStream in = apocalyptic.getResource("world.yml");
+            OutputStream out = null;
+            try {
+                out = new FileOutputStream(worldConfig);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+            int i;
+            try {
+                while ((i = in.read()) != -1) {
+                    out.write(i);
+                }
+                in.close();
+                out.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+        config = YamlConfiguration.loadConfiguration(worldConfig);
+
         ArrayList<BlockPopulator> pops;
         pops = new ArrayList<>();
         pops.add(new DungeonPopulator());
-        pops.add(new OasisPopulator());
+        pops.add(new OasisPopulator(config.getInt("oases.frequency"), config.getInt("oases.size.max"), config.getInt("oases.size.min")));
         pops.add(new TreePopulator());
         pops.add(new OrePopulator(world));
-        pops.add(new AbandonedHousePopulator(apocalyptic));
+        pops.add(new AbandonedHousePopulator(apocalyptic, config));
         pops.add(new CavePopulator());
         pops.add(new LavaPopulator());
         

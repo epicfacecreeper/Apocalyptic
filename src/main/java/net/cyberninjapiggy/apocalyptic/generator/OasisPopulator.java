@@ -30,10 +30,20 @@ import java.util.Random;
  * @author Nick
  */
 public class OasisPopulator extends BlockPopulator {
+    private int frequency;
+    private final int maxSize;
+    private final int minSize;
+
+    public OasisPopulator(int frequency, int maxSize, int minSize) {
+        this.frequency = frequency;
+
+        this.maxSize = maxSize;
+        this.minSize = minSize;
+    }
 
     @Override
     public void populate(World world, Random rand, Chunk chunk) {
-        if (rand.nextInt(200) == 0) {
+        if (rand.nextInt(frequency) == 0) {
             int realX = 0;
             int realZ = 0;
             boolean flag = false;
@@ -50,7 +60,7 @@ public class OasisPopulator extends BlockPopulator {
             }
             if (!flag)
                 return;
-            int size = rand.nextInt(5) + 5;
+            int size = rand.nextInt(maxSize-minSize) + minSize;
             if (size % 2 == 0) {
                 size+=1;
             }

@@ -107,6 +107,8 @@ public final class Apocalyptic extends JavaPlugin {
         if (!new File(getDataFolder().getPath() + File.separator + "config.yml").exists()) {
             saveDefaultConfig();
         }
+
+
         else {
             if (!getConfig().getString("meta.version").equals(this.getDescription().getVersion())) {
                 getConfig().update(this);
