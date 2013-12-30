@@ -1,3 +1,2 @@
 Better zombie spawn point picking
-Schematics configurable in world config.
 Natural spawning for sugarcane and cactus.

@@ -24,6 +24,7 @@ import net.cyberninjapiggy.apocalyptic.Apocalyptic;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.generator.BlockPopulator;
@@ -35,6 +36,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 /**
  *
@@ -226,7 +228,13 @@ public class RavagedChunkGenerator extends ChunkGenerator {
         pops.add(new AbandonedHousePopulator(apocalyptic, config));
         pops.add(new CavePopulator());
         pops.add(new LavaPopulator());
-        
+
+        ConfigurationSection schematics = config.getConfigurationSection("schematics");
+        Set<String> keys = schematics.getKeys(false);
+        for (String key : keys) {
+            pops.add(new SchematicPopulator(apocalyptic, key+".schematic", config.getInt("schematics."+key)));
+        }
+
         if (genID != null) {
 	        String[] schems = genID.split(":");
 	        for (String s : schems) {
