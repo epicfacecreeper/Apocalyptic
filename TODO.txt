@@ -1,3 +1,3 @@
 Better zombie spawn point picking
-Let abandoned house loot be picked in config
-Let user change size/frequency of oases
+Schematics configurable in world config.
+Natural spawning for sugarcane and cactus.
