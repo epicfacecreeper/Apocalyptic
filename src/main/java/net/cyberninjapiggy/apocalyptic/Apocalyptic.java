@@ -66,7 +66,7 @@ public final class Apocalyptic extends JavaPlugin {
     private Messages messages;
 
     private static final int dboId = 43663;
-    private static final String texturePack = "https://www.dropbox.com/s/waiut1qz722uojh/apocalyptic%20texture%20pack.zip?dl=1";
+    private static final String texturePack = "http://www.curseforge.com/media/files/769/14/apocalyptic_texture_pack.zip";
     
     private static final String METADATA_KEY = "radiation";
 
