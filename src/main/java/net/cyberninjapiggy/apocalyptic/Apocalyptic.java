@@ -109,6 +109,8 @@ public final class Apocalyptic extends JavaPlugin {
         }
 
 
+
+
         else {
             if (!getConfig().getString("meta.version").equals(this.getDescription().getVersion())) {
                 getConfig().update(this);
@@ -140,7 +142,7 @@ public final class Apocalyptic extends JavaPlugin {
         			new Updater(this, dboId, this.getFile(), Updater.UpdateType.NO_VERSION_CHECK, getConfig().getBoolean("meta.show-download-progress"));
         		}
         		else {
-        			log.info(ChatColor.GREEN + getMessages().getCaption("updateAvaliable") + versionCheck.getLatestName()); //$NON-NLS-3$
+        			log.info(ChatColor.GREEN + getMessages().getCaption("updateAvaliable") + ": " + versionCheck.getLatestName()); //$NON-NLS-3$
         		}
         	}
         }

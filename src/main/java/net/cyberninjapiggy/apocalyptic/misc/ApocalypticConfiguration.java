@@ -39,6 +39,8 @@ public class ApocalypticConfiguration extends YamlConfiguration {
             if (s.equals("meta.version")) {
                 continue;
             }
+            if (!this.contains(s))
+                this.createSection(s);
             this.set(s, vals.get(s));
         }
         //plugin.saveConfig();
