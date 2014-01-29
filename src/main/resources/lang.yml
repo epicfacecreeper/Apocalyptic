@@ -2,6 +2,7 @@ dbname: apocalyptic
 errNotOpenDatabase: Could not open database
 gasMask: Gas Mask
 grays: Grays
+acidRain: Acid Rain
 hazmat: Hazmat
 hazmatBoots: Hazmat Boots
 hazmatPants: Hazmat Pants

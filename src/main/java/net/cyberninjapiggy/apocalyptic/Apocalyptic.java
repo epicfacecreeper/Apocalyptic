@@ -245,7 +245,7 @@ public final class Apocalyptic extends JavaPlugin {
 	                        if (p.getEquipment().getHelmet() == null
 	                                && p.getWorld().getHighestBlockYAt(l.getBlockX(), l.getBlockZ()) <= l.getBlockY() &&
 	                                p.getWorld().hasStorm()) {
-	                            p.damage(p.getWorld().getDifficulty().ordinal()*2);
+	                            Util.damageWithCause(p, getMessages().getCaption("acidRain"), p.getWorld().getDifficulty().ordinal()*2);
 	                        }
 	                        //Neurological death syndrome
 	                        if (radiationManager.getPlayerRadiation(p) >= 10.0D) {

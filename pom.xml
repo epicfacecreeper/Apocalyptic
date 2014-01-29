@@ -8,6 +8,12 @@
     <artifactId>Apocalyptic</artifactId>
     <version>2.3.5</version>
 
+    <properties>
+        <bukkitDir>C:/Users/Nick/Programming/LocalBukkit/</bukkitDir>
+
+        <buildDir>${build.outputDirectory}</buildDir>
+    </properties>
+
     <repositories>
         <repository>
             <id>bukkit-repo</id>
@@ -89,6 +95,14 @@
                     <target>1.7</target>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.3.1</version>
+                <configuration>
+                    <outputDirectory>${buildDir}</outputDirectory>
+                </configuration>
+            </plugin>
         </plugins>
         <resources>
             <resource>
@@ -104,4 +118,19 @@
             </resource>
         </resources>
     </build>
+
+    <profiles>
+        <profile>
+            <id>bukkit-test</id>
+            <properties>
+                <buildDir>${bukkitDir}/Plugins/</buildDir>
+            </properties>
+        </profile>
+        <profile>
+            <id>normal-build</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+    </profiles>
 </project>
