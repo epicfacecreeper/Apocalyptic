@@ -20,6 +20,7 @@
 package net.cyberninjapiggy.apocalyptic.misc;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Squid;
@@ -59,5 +60,11 @@ public class Util {
         e.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1));
         p.damage(damage, e);
         e.remove();
+    }
+    public static double getBiomeTemp(Location l) {
+        int x = l.getBlockX();
+        int z = l.getBlockZ();
+
+        return l.getWorld().getTemperature(x, z);
     }
 }

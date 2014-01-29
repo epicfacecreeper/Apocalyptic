@@ -241,9 +241,10 @@ public final class Apocalyptic extends JavaPlugin {
                     	if (!noFallout && (worldEnabledFallout(w.getName()) || forceFallout)) {
 	                        //Acid Rain
 	                        Location l = p.getLocation();
+                            double temp = Util.getBiomeTemp(l);
 	                        if (p.getEquipment().getHelmet() == null
 	                                && p.getWorld().getHighestBlockYAt(l.getBlockX(), l.getBlockZ()) <= l.getBlockY() &&
-	                                p.getWorld().hasStorm()) {
+	                                p.getWorld().hasStorm() && temp < 1.0D) {
 	                            Util.damageWithCause(p, getMessages().getCaption("acidRain"), p.getWorld().getDifficulty().ordinal() * 2);
 	                        }
 	                        //Neurological death syndrome
