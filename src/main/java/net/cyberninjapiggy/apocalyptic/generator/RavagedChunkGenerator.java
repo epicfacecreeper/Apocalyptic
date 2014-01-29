@@ -230,9 +230,11 @@ public class RavagedChunkGenerator extends ChunkGenerator {
         pops.add(new LavaPopulator());
 
         ConfigurationSection schematics = config.getConfigurationSection("schematics");
-        Set<String> keys = schematics.getKeys(false);
-        for (String key : keys) {
-            pops.add(new SchematicPopulator(apocalyptic, key+".schematic", config.getInt("schematics."+key)));
+        if (schematics != null) {
+	        Set<String> keys = schematics.getKeys(false);
+	        for (String key : keys) {
+	            pops.add(new SchematicPopulator(apocalyptic, key+".schematic", config.getInt("schematics."+key)));
+	        }
         }
 
         if (genID != null) {
