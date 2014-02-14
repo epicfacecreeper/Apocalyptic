@@ -16,3 +16,6 @@ commands:
     description: Plugin Management
     usage: /apocalyptic <reload|stop|radiation>
     aliases: [apoc]
+  hazmat:
+    description: Give yourself or others pieces of Hazmat armor.
+    usage: /hazmat <helmet|chest|pants|boots|> [player]

@@ -25,6 +25,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import lib.PatPeter.SQLibrary.Database;
 import lib.PatPeter.SQLibrary.SQLite;
 import net.cyberninjapiggy.apocalyptic.commands.ApocalypticCommandExecutor;
+import net.cyberninjapiggy.apocalyptic.commands.HazmatCommandExecutor;
 import net.cyberninjapiggy.apocalyptic.commands.RadiationCommandExecutor;
 import net.cyberninjapiggy.apocalyptic.events.*;
 import net.cyberninjapiggy.apocalyptic.generator.RavagedChunkGenerator;
@@ -149,7 +150,8 @@ public final class Apocalyptic extends JavaPlugin {
         //CommandExecutors
         getCommand("radiation").setExecutor(new RadiationCommandExecutor(this));
         getCommand("apocalyptic").setExecutor(new ApocalypticCommandExecutor(this));
-        
+        getCommand("hazmat").setExecutor(new HazmatCommandExecutor(this));
+
         //Register Listeners
         getServer().getPluginManager().registerEvents(new PlayerSpawn(this), this);
         getServer().getPluginManager().registerEvents(new MonsterSpawn(this), this);
@@ -371,10 +373,12 @@ public final class Apocalyptic extends JavaPlugin {
     				(cmd.equals("radiation.change") && p.hasPermission("apocalyptic.radiation.change.self"))  ||
     				(cmd.equals("apocalyptic.radhelp") && p.hasPermission("apocalyptic.help.radiation")) ||
     				(cmd.equals("apocalyptic.stop") && p.hasPermission("apocalyptic.admin.stop")) ||
-    				(cmd.equals("apocalyptic.reload") && p.hasPermission("apocalyptic.admin.reload"));
+    				(cmd.equals("apocalyptic.reload") && p.hasPermission("apocalyptic.admin.reload") ||
+                    (cmd.equals("hazmatArmor.self") && p.hasPermission("apocalyptic.hazmatArmor.self")) ||
+                    (cmd.equals("hazmatArmor.other") && p.hasPermission("apocalyptic.hazmatArmor.other")));
     	}
     	else {
-            return !(cmd.equals("radiation.other") || cmd.equals("radiation.change") || cmd.equals("apocalyptic.stop") || cmd.equals("apocalyptic.reload")) || p.isOp();
+            return !(cmd.equals("radiation.other") || cmd.equals("radiation.change") || cmd.equals("apocalyptic.stop") || cmd.equals("apocalyptic.reload") || cmd.equals("hazmatArmor.self") || cmd.equals("hazmatArmor.other")) || p.isOp();
         }
     }
     private Plugin getWorldGuard() {
