@@ -45,8 +45,9 @@ public class RavagedChunkGenerator extends ChunkGenerator {
 
     private final String genID;
 	private final Apocalyptic apocalyptic;
+    private boolean dirtOnTop;
 
-	public RavagedChunkGenerator(Apocalyptic p, String genID) {
+    public RavagedChunkGenerator(Apocalyptic p, String genID) {
 		this.genID = genID;
 		this.apocalyptic = p;
 
@@ -169,7 +170,7 @@ public class RavagedChunkGenerator extends ChunkGenerator {
 	                        		setBlock(x,y,z,chunk,Material.DIRT);
 	                        	}
 	                        	else {
-	                        		setBlock(x,y,z,chunk,Material.MYCEL);
+	                        		setBlock(x,y,z,chunk, dirtOnTop ? Material.DIRT : Material.MYCEL);
 	                        	}
                         	}
                         }
@@ -235,6 +236,8 @@ public class RavagedChunkGenerator extends ChunkGenerator {
 	            pops.add(new SchematicPopulator(apocalyptic, key+".schematic", config.getInt("schematics."+key)));
 	        }
         }
+
+        dirtOnTop = config.getBoolean("dirt-on-top", false);
 
         if (genID != null) {
 	        String[] schems = genID.split(":");

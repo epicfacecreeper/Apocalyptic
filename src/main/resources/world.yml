@@ -1,4 +1,5 @@
 schematics:
+dirt-on-top: false
 oases:
     frequency: 200
     size:
