@@ -30,7 +30,7 @@
     <properties>
         <bukkitDir>C:/Users/Nick/Programming/LocalBukkit/</bukkitDir>
 
-        <buildDir>${build.outputDirectory}</buildDir>
+        <buildDir>${project.build.outputDirectory}</buildDir>
     </properties>
 
     <repositories>
@@ -119,20 +119,31 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>2.3.1</version>
                 <configuration>
+                    <excludes>
+                        <exclude>${basedir}/target/*</exclude>
+                    </excludes>
                     <outputDirectory>${buildDir}</outputDirectory>
                 </configuration>
             </plugin>
         </plugins>
         <resources>
             <resource>
+            <targetPath>.</targetPath>
+            <filtering>true</filtering>
+            <directory>${basedir}/src/main/resources</directory>
+            <includes>
+                <include>plugin.yml</include>
+                <include>config.yml</include>
+                <include>lang.yml</include>
+                <include>world.yml</include>
+            </includes>
+            </resource>
+            <resource>
                 <targetPath>.</targetPath>
                 <filtering>true</filtering>
-                <directory>${basedir}/src/main/resources</directory>
+                <directory>${basedir}</directory>
                 <includes>
-                    <include>plugin.yml</include>
-                    <include>config.yml</include>
-                    <include>lang.yml</include>
-                    <include>world.yml</include>
+                    <include>LICENSE.txt</include>
                 </includes>
             </resource>
         </resources>
@@ -150,6 +161,9 @@
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
+            <properties>
+                    <buildDir>${basedir}/target/</buildDir>
+            </properties>
         </profile>
     </profiles>
 </project>
