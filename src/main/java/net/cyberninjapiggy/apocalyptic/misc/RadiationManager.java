@@ -39,11 +39,11 @@ public class RadiationManager {
     public void saveRadiation(Player p) throws SQLException {
         db.open();
         if (!p.getMetadata(apocalyptic.getMetadataKey()).isEmpty()) {
-            if (db.query("SELECT COUNT(*) AS \"exists\" FROM radiationLevels WHERE player=\"" + p.getName() + "\";").getInt("exists") > 0) { //$NON-NLS-3$
-                db.query("UPDATE radiationLevels SET level="+p.getMetadata(apocalyptic.getMetadataKey()).get(0).asDouble()+" WHERE player=\"" + p.getName()+"\";");
+            if (db.query("SELECT COUNT(*) AS \"exists\" FROM radiationLevels WHERE player=\"" + p.getUniqueId() + "\";").getInt("exists") > 0) { //$NON-NLS-3$
+                db.query("UPDATE radiationLevels SET level="+p.getMetadata(apocalyptic.getMetadataKey()).get(0).asDouble()+" WHERE player=\"" + p.getUniqueId()+"\";");
             }
             else {
-                db.query("INSERT INTO radiationLevels (player, level) VALUES (\"" + p.getName() + "\", " + p.getMetadata(apocalyptic.getMetadataKey()).get(0).asDouble() + ");"); //$NON-NLS-3$
+                db.query("INSERT INTO radiationLevels (player, level) VALUES (\"" + p.getUniqueId() + "\", " + p.getMetadata(apocalyptic.getMetadataKey()).get(0).asDouble() + ");"); //$NON-NLS-3$
             }
         }
         db.close();
@@ -53,7 +53,7 @@ public class RadiationManager {
         db.open();
         ResultSet result;
         try {
-            result = db.query("SELECT * FROM radiationLevels WHERE player=\""+p.getName()+"\"");
+            result = db.query("SELECT * FROM radiationLevels WHERE player=\""+p.getUniqueId()+"\"");
             while (result.next()) {
                 p.setMetadata(apocalyptic.getMetadataKey(), new FixedMetadataValue(apocalyptic, result.getDouble("level")));
             }

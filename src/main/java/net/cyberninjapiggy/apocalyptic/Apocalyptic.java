@@ -47,9 +47,9 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Random;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -113,7 +113,7 @@ public final class Apocalyptic extends JavaPlugin {
 
         else {
             if (!getConfig().getString("meta.version").equals(this.getDescription().getVersion())) {
-                getConfig().update(this);
+                //getConfig().update(this);
             }
         }
         db = new SQLite(log, getMessages().getCaption("logtitle"), getDataFolder().getAbsolutePath(), "apocalyptic");
@@ -124,12 +124,47 @@ public final class Apocalyptic extends JavaPlugin {
             return;
         }
         try {
-            db.query("CREATE TABLE IF NOT EXISTS radiationLevels ("
-                    + "id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,"
-                    + "player VARCHAR(16),"
-                    + "level DOUBLE);");
+            if (db.isTable("radiationLevels")) {
+                ResultSet resultSet = db.query("SELECT * FROM radiationLevels");
+                Map<String, Double> toUpdate = new HashMap<>();
+                while (resultSet.next()) {
+                    String player = resultSet.getString("player");
+                    double level = resultSet.getDouble("level");
+                    if (player.length() <= 16) {
+                        toUpdate.put(player, level);
+                    }
+
+                }
+
+                if (toUpdate.size() > 0) {
+                    log.info("Apocalyptic is converting your database. Please stand by...");
+
+                    db.query("DROP TABLE radiationLevels");
+                    db.query("CREATE TABLE radiationLevels ("
+                            + "id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,"
+                            + "player VARCHAR(36),"
+                            + "level DOUBLE);");
+
+                    UUIDFetcher fetcher = new UUIDFetcher(toUpdate.keySet());
+                    Map<String, UUID> uuidMap = fetcher.call();
+
+                    for (Map.Entry<String, UUID> entry : uuidMap.entrySet()) {
+                        db.query("INSERT INTO radiationLevels (player, level) VALUES (\"" + entry.getValue() + "\", \"" + toUpdate.get(entry.getKey()) + "\");");
+                    }
+                }
+            }
+            else {
+                db.query("CREATE TABLE radiationLevels ("
+                        + "id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,"
+                        + "player VARCHAR(36),"
+                        + "level DOUBLE);");
+            }
+
         } catch (SQLException ex) {
             log.log(Level.SEVERE, null, ex);
+        } catch (Exception e) {
+            log.severe("Exception fetching UUIDs");
+            log.log(Level.SEVERE, null, e);
         }
         db.close();
 
@@ -137,7 +172,7 @@ public final class Apocalyptic extends JavaPlugin {
 
         if (getConfig().getBoolean("meta.version-check")) {
         	Updater versionCheck = new Updater(this, dboId, this.getFile(), Updater.UpdateType.NO_DOWNLOAD, false);
-        	if (!versionCheck.getLatestName().equals(this.getDescription().getName() + " v" + this.getDescription().getVersion())) {
+        	if (versionCheck.getResult() != Updater.UpdateResult.DISABLED && !versionCheck.getLatestName().equals(this.getDescription().getName() + " v" + this.getDescription().getVersion())) {
         		if (getConfig().getBoolean("meta.auto-update")) {
         			new Updater(this, dboId, this.getFile(), Updater.UpdateType.NO_VERSION_CHECK, getConfig().getBoolean("meta.show-download-progress"));
         		}

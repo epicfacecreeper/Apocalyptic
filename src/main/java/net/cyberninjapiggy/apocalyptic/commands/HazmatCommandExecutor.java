@@ -65,9 +65,11 @@ public class HazmatCommandExecutor implements CommandExecutor {
                     commandSender.sendMessage(ChatColor.RED+"This command can only be used by a player!");
                 }
             }
+
             else if (args.length == 2) {
                 if (plugin.canDoCommand(commandSender, "hazmatArmor.other")) {
                     Player player;
+                    //I am allowing deprecated usage because it is easier to use a command on a player using name.
                     if ((player = Bukkit.getPlayer(args[1])) == null) {
                         commandSender.sendMessage("Cannot find that player.");
                         return true;
