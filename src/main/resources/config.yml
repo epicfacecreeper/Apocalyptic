@@ -18,7 +18,7 @@ worlds:
         spawnLimit: 512
         burnInDaylight: false
         health: 25.0
-        speedMultiplier: 3.0
+        speedMultiplier: 1.2
         damageMultiplier: 2
         hordeInstinct: true
         targetRange: 32.0

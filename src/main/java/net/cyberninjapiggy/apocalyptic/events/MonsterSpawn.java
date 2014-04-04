@@ -21,17 +21,22 @@ package net.cyberninjapiggy.apocalyptic.events;
 
 import net.cyberninjapiggy.apocalyptic.Apocalyptic;
 import net.cyberninjapiggy.apocalyptic.misc.ZombieHelper;
+import net.minecraft.server.v1_7_R2.AttributeInstance;
+import net.minecraft.server.v1_7_R2.AttributeModifier;
+import net.minecraft.server.v1_7_R2.EntityInsentient;
+import net.minecraft.server.v1_7_R2.GenericAttributes;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.entity.Creeper;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Skeleton;
-import org.bukkit.entity.Zombie;
+import org.bukkit.craftbukkit.v1_7_R2.entity.CraftLivingEntity;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.UUID;
 
 /**
  *
@@ -39,6 +44,23 @@ import org.bukkit.inventory.ItemStack;
  */
 public class MonsterSpawn implements Listener {
     private final Apocalyptic a;
+    private final UUID zombieSpeedUUID = UUID.fromString("fb972eb0-b792-4ec3-b255-5740974f6eed");
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onEntitySpawn(CreatureSpawnEvent event){
+        LivingEntity entity = event.getEntity();
+
+        if (entity.getType() == EntityType.ZOMBIE && a.worldEnabledZombie(entity.getLocation().getWorld().getName())){
+            EntityInsentient nmsEntity = (EntityInsentient) ((CraftLivingEntity) entity).getHandle();
+            AttributeInstance attributes = nmsEntity.getAttributeInstance(GenericAttributes.d);
+
+            AttributeModifier modifier = new AttributeModifier(zombieSpeedUUID, "Apocalyptic movement speed modifier", a.getConfig().getWorld(event.getEntity().getWorld()).getDouble("mobs.zombies.speedMultiplier"), 1);
+
+            attributes.b(modifier);
+            attributes.a(modifier);
+        }
+    }
+
     @EventHandler
     public void onMonsterSpawn(CreatureSpawnEvent e) {
         
