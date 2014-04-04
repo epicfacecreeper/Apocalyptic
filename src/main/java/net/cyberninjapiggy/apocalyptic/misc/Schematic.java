@@ -102,8 +102,10 @@ public class Schematic
                 for (int z = 0; z < length; ++z) {
                     int index = y * width * length + z * width + x;
                     Block block = new Location(world, x + loc.getX(), y + loc.getY(), z + loc.getZ()).getBlock();
-                    //noinspection deprecation
-                    block.setTypeIdAndData(blocks[index], blockData[index], true);
+
+
+                    if (block != null)  //noinspection deprecation
+                        block.setTypeIdAndData(blocks[index], blockData[index], true);
                 }
             }
         }
