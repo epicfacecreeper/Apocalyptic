@@ -219,13 +219,15 @@ public class RavagedChunkGenerator extends ChunkGenerator {
         }
         config = YamlConfiguration.loadConfiguration(worldConfig);
 
+        ChestPopulator chestPopulator = new ChestPopulator(config, apocalyptic);
+
         ArrayList<BlockPopulator> pops;
         pops = new ArrayList<>();
         pops.add(new DungeonPopulator());
         pops.add(new OasisPopulator(config.getInt("oases.frequency"), config.getInt("oases.size.max"), config.getInt("oases.size.min")));
         pops.add(new TreePopulator());
         pops.add(new OrePopulator(world));
-        pops.add(new AbandonedHousePopulator(apocalyptic, config));
+        pops.add(new AbandonedHousePopulator(apocalyptic, config, chestPopulator));
         pops.add(new CavePopulator());
         pops.add(new LavaPopulator());
 
@@ -233,7 +235,7 @@ public class RavagedChunkGenerator extends ChunkGenerator {
         if (schematics != null) {
 	        Set<String> keys = schematics.getKeys(false);
 	        for (String key : keys) {
-	            pops.add(new SchematicPopulator(apocalyptic, key+".schematic", config.getInt("schematics."+key)));
+	            pops.add(new SchematicPopulator(apocalyptic, key+".schematic", config.getInt("schematics."+key), chestPopulator));
 	        }
         }
 
@@ -244,7 +246,7 @@ public class RavagedChunkGenerator extends ChunkGenerator {
 	        for (String s : schems) {
 	        	String name = s.split("@")[0];
 	        	int chance = Integer.parseInt(s.split("@")[1]);
-	        	pops.add(new SchematicPopulator(apocalyptic, name+".schematic", chance));
+	        	pops.add(new SchematicPopulator(apocalyptic, name+".schematic", chance, chestPopulator));
 	        }
         }
         

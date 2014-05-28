@@ -17,7 +17,9 @@ package net.cyberninjapiggy.apocalyptic.misc;
 */
 
 import com.sk89q.jnbt.*;
+import net.cyberninjapiggy.apocalyptic.generator.ChestPopulator;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 
@@ -25,6 +27,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Map;
+import java.util.Random;
 import java.util.zip.GZIPInputStream;
 
 /**
@@ -88,7 +91,8 @@ public class Schematic
     {
         return height;
     }
-    public static void pasteSchematic(World world, Location loc, Schematic schematic)
+    @SuppressWarnings("deprecation")
+    public static void pasteSchematic(World world, Location loc, Schematic schematic, ChestPopulator chestPopulator, Random rand)
     {
         byte[] blocks = schematic.getBlocks();
         byte[] blockData = schematic.getData();
@@ -103,9 +107,15 @@ public class Schematic
                     int index = y * width * length + z * width + x;
                     Block block = new Location(world, x + loc.getX(), y + loc.getY(), z + loc.getZ()).getBlock();
 
-
-                    if (block != null)  //noinspection deprecation
+                    if (block != null) {
                         block.setTypeIdAndData(blocks[index], blockData[index], true);
+
+                        if (block.getType() == Material.CHEST) {
+                            chestPopulator.populateChest(block.getLocation(), rand);
+                        }
+                    }
+
+
                 }
             }
         }

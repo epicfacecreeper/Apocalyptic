@@ -34,9 +34,11 @@ public class SchematicPopulator extends BlockPopulator {
 
 	private Schematic schematic;
 	private final int chance;
+    private ChestPopulator chestPopulator;
 
-	public SchematicPopulator(Plugin p, String schemName, int chance) {
-		try {
+    public SchematicPopulator(Plugin p, String schemName, int chance, ChestPopulator chestPopulator) {
+        this.chestPopulator = chestPopulator;
+        try {
 			this.schematic = Schematic.loadSchematic(new File(p.getDataFolder().getAbsolutePath()+File.separator+"schematics"+File.separator+schemName));
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -55,7 +57,7 @@ public class SchematicPopulator extends BlockPopulator {
         if (yPos < 63) {
             return;
         }
-        Schematic.pasteSchematic(world, new Location(world, xPos, yPos, zPos), schematic);
+        Schematic.pasteSchematic(world, new Location(world, xPos, yPos, zPos), schematic, chestPopulator, rand);
 	}
 
 }
