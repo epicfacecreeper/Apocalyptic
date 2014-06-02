@@ -356,10 +356,10 @@ public final class Apocalyptic extends JavaPlugin {
      */
     public boolean playerWearingHazmatSuit(Player p) {
         EntityEquipment e = p.getEquipment();
-        boolean helmet =  e.getHelmet() != null && e.getHelmet().hasItemMeta() && (e.getHelmet().getItemMeta().getDisplayName().startsWith(ChatColor.RESET + getMessages().getCaption("gasMask")) || e.getHelmet().getItemMeta().getDisplayName().startsWith(ChatColor.RESET + getMessages().getCaption("hazmat")));
-        boolean chest =  e.getChestplate() != null && e.getChestplate().hasItemMeta() && e.getChestplate().getItemMeta().getDisplayName().startsWith(ChatColor.RESET + getMessages().getCaption("hazmat"));
-        boolean legs =  e.getLeggings() != null && e.getLeggings().hasItemMeta() && e.getLeggings().getItemMeta().getDisplayName().startsWith(ChatColor.RESET + getMessages().getCaption("hazmat"));
-        boolean boots =  e.getBoots() != null && e.getBoots().hasItemMeta() && e.getBoots().getItemMeta().getDisplayName().startsWith(ChatColor.RESET + getMessages().getCaption("hazmat"));
+        boolean helmet =  e.getHelmet() != null && e.getHelmet().hasItemMeta() && e.getHelmet().getItemMeta().hasDisplayName() && (e.getHelmet().getItemMeta().getDisplayName().startsWith(ChatColor.RESET + getMessages().getCaption("gasMask")) || e.getHelmet().getItemMeta().getDisplayName().startsWith(ChatColor.RESET + getMessages().getCaption("hazmat")));
+        boolean chest =  e.getChestplate() != null && e.getChestplate().hasItemMeta() && e.getChestplate().getItemMeta().hasDisplayName() && e.getChestplate().getItemMeta().getDisplayName().startsWith(ChatColor.RESET + getMessages().getCaption("hazmat"));
+        boolean legs =  e.getLeggings() != null && e.getLeggings().hasItemMeta() && e.getLeggings().getItemMeta().hasDisplayName() && e.getLeggings().getItemMeta().getDisplayName().startsWith(ChatColor.RESET + getMessages().getCaption("hazmat"));
+        boolean boots =  e.getBoots() != null && e.getBoots().hasItemMeta() && e.getBoots().getItemMeta().hasDisplayName() && e.getBoots().getItemMeta().getDisplayName().startsWith(ChatColor.RESET + getMessages().getCaption("hazmat"));
         return helmet && chest && legs && boots;
     }
 
